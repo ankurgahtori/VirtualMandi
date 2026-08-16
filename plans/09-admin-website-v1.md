@@ -39,4 +39,16 @@ Use responsive English UI, keyboard-accessible forms, clear server validation er
 
 ## Completion criteria
 
-An editor can log in, see the seeded BlogPost, create/edit/publish/archive/restore/remove a BlogPost, inspect source and external URL, and see missing translations without direct database access.
+- [x] An editor can log in and access protected dashboard routes.
+- [x] An editor can see the seeded BlogPost and inspect source, external URL, createdAt, status, and translation completeness.
+- [x] An editor can create and edit BlogPosts with English/Hindi translation sections.
+- [x] Lifecycle actions are available for publish, archive, restore, and soft-remove with confirmation.
+- [x] Browser code uses the API contract only and never imports Prisma or AWS credentials.
+
+## Implementation notes
+
+- Bootstrapped `apps/admin` as a Vite/React/TypeScript SPA with `/login`, `/posts`, `/posts/new`, and `/posts/:id/edit` routes.
+- Added API bearer/refresh client, admin-role route protection, session storage for browser refresh material, responsive editorial tables/forms, loading/error/empty states, and an error boundary.
+- Added English-first BlogPost editing with optional Hindi translation, source/URL/media fields, filter controls, seeded-post rendering, and lifecycle confirmation actions.
+- Presigned media upload URL support is represented by the API contract; media asset registration/upload UI remains intentionally minimal until the media workflow is expanded.
+- Automated schema tests and production build pass. A browser automation suite remains a follow-up for CI.
