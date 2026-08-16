@@ -4,7 +4,7 @@ Virtual Mandi is a multilingual agricultural content platform with an Expo mobil
 
 ## Current status
 
-Plans 02 (monorepo foundation) and 03 (shared contracts) are implemented. Start Docker Desktop and run `pnpm infra:up` to validate the PostgreSQL and LocalStack containers. Prisma, API, admin, and mobile features are intentionally not implemented yet.
+Plans 02 (monorepo foundation), 03 (shared contracts), and 04 (Prisma data layer) are implemented. Start Docker Desktop and run `pnpm infra:up` to validate the PostgreSQL and LocalStack containers. If host port `5432` is occupied, use `POSTGRES_PORT=5433 docker compose up -d postgres localstack` and point `DATABASE_URL` at port `5433`. API, admin, and mobile features are intentionally not implemented yet.
 
 ## Prerequisites
 

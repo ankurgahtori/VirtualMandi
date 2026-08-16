@@ -1,2 +1,3 @@
-// Prisma is intentionally not initialized until Plan 04.
-export const packageName = '@virtual-mandi/database';
+export { prisma, disconnectDatabase } from './client.js';
+export * from './generated/client.js';
+export * from './repositories/post-repository.js';

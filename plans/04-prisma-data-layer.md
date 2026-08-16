@@ -1,5 +1,9 @@
 # Plan 04 — Prisma data layer
 
+## Status
+
+Implemented. The Prisma schema, initial migration, generated server-only client, repositories, LocalStack media fixture, and repeatable seed runner are working against Docker PostgreSQL.
+
 ## Objective
 
 Implement the PostgreSQL schema, migrations, server-only Prisma package, and query helpers for the typed-post domain.

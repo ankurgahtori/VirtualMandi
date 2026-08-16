@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../packages/database/src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  FARMER
+  ADMIN
+}
+
+enum PostType {
+  BLOG_POST
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  REMOVED
+}
+
+enum PostSource {
+  WHATSAPP
+  WEBSITE
+  MANUAL
+}
+
+enum MediaProvider {
+  S3
+  LOCALSTACK_S3
+}
+
+model User {
+  id                    String           @id @default(cuid())
+  email                 String           @unique
+  passwordHash          String
+  role                  UserRole         @default(FARMER)
+  disabledAt            DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  createdPosts          Post[]           @relation("PostCreatedBy")
+  updatedPosts          Post[]           @relation("PostUpdatedBy")
+  refreshSessions       RefreshSession[]
+}
+
+model RefreshSession {
+  id                String    @id @default(cuid())
+  userId            String
+  tokenHash         String    @unique
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  deviceLabel       String?
+  userAgent         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model Locale {
+  id           String                 @id @default(cuid())
+  code         String                 @unique
+  displayName  String
+  createdAt    DateTime               @default(now())
+  translations BlogPostTranslation[]
+}
+
+model Post {
+  id                 String             @id @default(cuid())
+  type               PostType
+  status             PostStatus         @default(DRAFT)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  publishedAt        DateTime?
+  archivedAt         DateTime?
+  removedAt          DateTime?
+  createdById        String?
+  updatedById        String?
+  ingestionSource    PostSource?
+  ingestionItemId    String?
+  canonicalUrl       String?
+  fetchedAt          DateTime?
+  crawlerName        String?
+  crawlerVersion     String?
+  blogPost           BlogPost?
+  createdBy          User?              @relation("PostCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy          User?              @relation("PostUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  categories         PostCategory[]
+  locations          PostLocation[]
+
+  @@unique([ingestionSource, ingestionItemId])
+  @@index([status, publishedAt, id])
+  @@index([type, status])
+  @@index([ingestionSource, canonicalUrl])
+  @@index([createdAt])
+}
+
+model BlogPost {
+  postId              String                 @id
+  imageMediaId        String?
+  externalRedirectUrl String?
+  source              PostSource
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  post                Post                   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  imageMedia          MediaAsset?            @relation("BlogPostImage", fields: [imageMediaId], references: [id], onDelete: SetNull)
+  translations        BlogPostTranslation[]
+
+  @@index([source])
+}
+
+model BlogPostTranslation {
+  id          String   @id @default(cuid())
+  blogPostId  String
+  localeId    String
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blogPost    BlogPost @relation(fields: [blogPostId], references: [postId], onDelete: Cascade)
+  locale      Locale   @relation(fields: [localeId], references: [id], onDelete: Restrict)
+
+  @@unique([blogPostId, localeId])
+  @@index([localeId])
+}
+
+model MediaAsset {
+  id              String       @id @default(cuid())
+  provider        MediaProvider
+  bucket          String
+  objectKey       String       @unique
+  mimeType        String
+  sizeBytes       Int?
+  width           Int?
+  height          Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  blogPostImages  BlogPost[]   @relation("BlogPostImage")
+}
+
+model Category {
+  id          String         @id @default(cuid())
+  key         String         @unique
+  name        String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  posts       PostCategory[]
+}
+
+model Location {
+  id          String         @id @default(cuid())
+  key         String         @unique
+  name        String
+  level       String
+  parentId    String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  parent      Location?      @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Location[]     @relation("LocationTree")
+  posts       PostLocation[]
+
+  @@index([parentId])
+  @@index([level])
+}
+
+model PostCategory {
+  postId       String
+  categoryId   String
+  createdAt    DateTime @default(now())
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+  @@index([categoryId])
+}
+
+model PostLocation {
+  postId       String
+  locationId   String
+  createdAt    DateTime @default(now())
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  location     Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@id([postId, locationId])
+  @@index([locationId])
+}

@@ -25,6 +25,7 @@ localstack-data/
 
 # Prisma generated/runtime files
 prisma/generated/
+packages/database/src/generated/
 
 # Expo/native credentials
 *.p8
