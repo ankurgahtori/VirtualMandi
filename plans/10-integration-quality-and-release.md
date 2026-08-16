@@ -1,4 +1,4 @@
-# Plan 09 — Integration, quality, and release hardening
+# Plan 10 — Integration, quality, and release hardening
 
 ## Goal
 
@@ -10,11 +10,12 @@ Make the first end-to-end slice dependable enough for staging and future indepen
 - Add a disposable PostgreSQL integration-test workflow using the repository Docker image.
 - Add LocalStack S3 to integration tests and verify the same storage contract used by development.
 - Add API contract checks to detect drift between shared DTOs and clients.
-- Add end-to-end smoke coverage: admin creates/publishes content, mobile retrieves it, admin archives it, mobile no longer receives it.
+- Add end-to-end smoke coverage: seeded BlogPost appears in admin and mobile, admin creates/publishes a BlogPost, mobile retrieves it, admin archives it, and mobile no longer receives it.
 - Define environment variable documentation and staging/production secret handling.
 - Add structured logs, request IDs, health checks, and minimum error monitoring hooks.
 - Define database migration rollout and rollback guidance.
 - Add media hosting, CDN, caching, backup, retention, and privacy notes.
+- Verify crawler normalization and idempotent seed execution in CI.
 - Document production AWS S3 configuration separately from LocalStack development configuration.
 - Document release checklist and known v1 limitations.
 

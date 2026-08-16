@@ -28,13 +28,15 @@ Use this skill for work in the Virtual Mandi repository. Read the relevant file 
 - Use `Asia/Kolkata` for daily-content rules unless a plan explicitly overrides it.
 - Keep multilingual content translations separate from static mobile locale resources, and provide English fallback behavior.
 - Preserve feed filters for language, location, and category across API and clients.
+- Treat `Post` as the top-level entity and `BlogPost` as the first supported type; do not model future post types as unrelated top-level resources.
+- Ensure every model includes `createdAt`; use UTC persistence with IST application rules.
 - Keep AWS S3 behind a media-storage interface; use LocalStack S3 in Docker for local development and tests.
 - Avoid committing secrets, real credentials, production data, or platform signing files.
 - Prefer interfaces for external services such as media storage, analytics, and notifications.
 
 ## Product v1 boundary
 
-The core experience is self-registration with email/password authentication, bearer-token sessions, an Inshorts-style agricultural feed filtered by language/location/category, and content management for multilingual text, text with music, and video. The admin website is English in v1; the mobile app has namespaced locale files with English fallback. Social features, recommendations, OTP/social login, and advanced editorial roles are out of scope unless a plan is explicitly updated.
+The core experience is self-registration with email/password authentication, bearer-token sessions, an Inshorts-style agricultural feed filtered by language/location/category, and content management for multilingual typed posts. `Post` is the top-level entity and `BlogPost` is the first supported type with title, image, content, external URL, and source. The admin website is English in v1; the mobile app has namespaced locale files with English fallback. Social features, recommendations, OTP/social login, and advanced editorial roles are out of scope unless a plan is explicitly updated.
 
 ## Handoff standard
 

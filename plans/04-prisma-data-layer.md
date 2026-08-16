@@ -11,18 +11,21 @@ Define the PostgreSQL schema and a reusable, server-safe Prisma package while ke
 - Model at minimum:
   - users/accounts
   - refresh sessions or refresh tokens
-  - content items and publication/lifecycle metadata
-  - localized content translations with language and English fallback support
+  - `Post` as the top-level entity with `type` enum, initially `BLOG_POST`
+  - `BlogPost` as a one-to-one type-specific detail entity
+  - BlogPost title/content translations with language and required English fallback
+  - BlogPost image/media reference, external redirection URL, and source enum (`WHATSAPP`, `WEBSITE`, `MANUAL`)
+  - publication/lifecycle metadata and crawler provenance/deduplication fields
   - media assets and media variants/metadata as needed
   - categories and location hierarchy/filter relations
   - users/accounts and self-registration fields
-  - audit fields and soft deletion/archive metadata
+  - `createdAt` on every model; `updatedAt` on mutable models; soft deletion/archive metadata
 - Add indexes for active feed ordering, lifecycle filtering, email lookup, publication date, language, location, and category.
 - Add migrations and a deterministic, idempotent development seed runner.
 - Configure `packages/database` to export the Prisma client, lifecycle-safe helpers, transaction utilities, and seed orchestration entry points.
 - Add graceful client shutdown and a development-friendly singleton pattern.
 - Add a checked-in schema and migration policy; do not check in secrets or production data.
-- Add ordered seed modules, for example `user.seed.ts`, `location.seed.ts`, `category.seed.ts`, `content.seed.ts`, and `translation.seed.ts`, with explicit ordering and upsert/idempotency rules so foreign keys always exist before dependents.
+- Add ordered seed modules, for example `user.seed.ts`, `locale.seed.ts`, `location.seed.ts`, `category.seed.ts`, `media.seed.ts`, `post.seed.ts`, and `blog-post.seed.ts`, with explicit ordering and upsert/idempotency rules so foreign keys always exist before dependents. The seed must create at least one usable English BlogPost.
 - Define `pnpm db:seed`/`npm run seed` behavior as migrate/prepare database first, then execute seed modules in order; make reset and seed behavior explicit for development only.
 
 ## Important boundary
@@ -43,4 +46,4 @@ Only `apps/api` and server-side packages may import `@virtual-mandi/database`. T
 
 - A fresh database can be migrated and seeded reproducibly.
 - Generated client imports work from the API package.
-- Soft-delete/archive behavior and active-feed queries are covered by tests or repository helpers.
+- Soft-delete/archive behavior, Post type handling, BlogPost relations, and active-feed queries are covered by tests or repository helpers.

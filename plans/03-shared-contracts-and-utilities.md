@@ -8,10 +8,10 @@ Create platform-neutral code that is authored once and consumed by the API, admi
 
 Implement `packages/shared` with:
 
-- Content kind and lifecycle enums/constants.
+- `PostType` and lifecycle/source enums/constants; v1 supports `BLOG_POST` with sources `WHATSAPP`, `WEBSITE`, and `MANUAL`.
 - Supported locale, language, category, and location identifiers/conventions.
 - Shared identifiers, `Asia/Kolkata` daily-boundary rules, and timestamp conventions.
-- Content summary/detail DTOs for feed and admin use cases, including localized fields and fallback metadata.
+- `Post` and `BlogPost` summary/detail DTOs for feed and admin use cases, including localized fields, English fallback metadata, source, image/media, and external redirection URL.
 - Auth request/response DTOs.
 - Runtime validation schemas for API boundaries (prefer an existing workspace dependency such as Zod).
 - API error envelope and pagination/cursor types.
@@ -19,11 +19,12 @@ Implement `packages/shared` with:
 - Mobile static-translation organization with namespaced locale resources such as `en.json` and `hi.json`, separated into common and page-level keys.
 - Translation lookup/fallback utility: requested locale -> configured fallback -> English.
 - Export maps that make public imports explicit.
-- Unit tests for schemas, serialization edge cases, locale fallback, and filter validation.
+- Add crawler input/output schemas for normalized BlogPost ingestion and seed data.
+- Unit tests for schemas, serialization edge cases, locale fallback, filter validation, Post type discrimination, and source validation.
 
 ## Domain shape to support
 
-A content item should be able to represent text, text plus music, and video without exposing storage implementation details to clients. Include title/summary/body or caption, media metadata, language/category fields if accepted in Plan 00, publication timestamps, and lifecycle metadata.
+The shared domain should expose a top-level `Post` with a discriminating `type`, beginning with `BLOG_POST`. Keep type-specific fields in the BlogPost DTO and leave room for future post types. A BlogPost includes localized title/content, image/media, external redirection URL, source, language/category/location fields, publication timestamps, and lifecycle metadata without exposing storage implementation details.
 
 ## Constraints
 

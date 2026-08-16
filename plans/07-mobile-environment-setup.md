@@ -1,4 +1,4 @@
-# Plan 06 — Mobile environment setup
+# Plan 07 — Mobile environment setup
 
 ## Goal
 

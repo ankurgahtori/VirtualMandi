@@ -1,4 +1,4 @@
-# Plan 07 — Mobile application v1
+# Plan 08 — Mobile application v1
 
 ## Goal
 
@@ -11,7 +11,7 @@ Deliver the Inshorts-style farmer feed using the API and shared contracts.
 - Organize static mobile strings into locale files such as `en.json` and `hi.json`, with common and page-specific namespaces.
 - Implement a vertically paged story feed with loading, pull-to-refresh, empty, offline, and error states.
 - Add language, location, and category filter selection, retaining the selected filters across feed requests.
-- Render localized text stories with readable typography, accessible controls, and English fallback when a translation is unavailable.
+- Render localized BlogPost items with readable typography, accessible controls, external-link action, and English fallback when a translation is unavailable.
 - Render text-with-music stories with play/pause, progress, mute, and cleanup when changing stories.
 - Render video stories with basic playback controls, loading state, and failure fallback.
 - Add prefetching/caching only where it improves the current feed without introducing complex recommendations.

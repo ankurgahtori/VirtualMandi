@@ -1,8 +1,8 @@
-# Plan 05 — Backend API
+# Plan 06 — Backend API
 
 ## Goal
 
-Build the Node.js TypeScript API that authenticates users, manages editorial content, and serves the mobile feed.
+Build the Node.js TypeScript API that authenticates users, manages typed posts, and serves the mobile feed.
 
 ## Scope
 
@@ -14,12 +14,14 @@ Build the Node.js TypeScript API that authenticates users, manages editorial con
   - safe responses that do not reveal whether an email exists
   - rate limiting and basic brute-force protections
 - Implement authorization for authenticated users and admin/editor operations.
-- Implement content endpoints for create, update, list by state, publish, archive, restore, and soft-remove.
-- Implement the mobile feed endpoint with stable ordering, pagination, and only published/non-deleted content.
+- Implement typed post endpoints for create, update, list by state/type/source, publish, archive, restore, and soft-remove; implement BlogPost first.
+- Implement the mobile feed endpoint with stable ordering, pagination, and only published/non-deleted posts; return BlogPost data for `BLOG_POST` items.
 - Support feed filtering by requested language, location, and category, with English translation fallback when a requested translation is unavailable.
 - Apply `Asia/Kolkata` consistently to daily-content boundaries and document UTC storage versus IST presentation/query behavior.
 - Return shared DTOs and validation errors from `@virtual-mandi/shared`.
 - Add OpenAPI documentation or an equivalent generated API contract.
+- Expose admin views containing BlogPost source and external redirection URL.
+- Keep crawler ingestion behind the Plan 05 ingestion service; API endpoints may trigger or review ingestion results but crawler adapters must not access Prisma directly.
 - Add health/readiness endpoints and database error handling.
 - Add unit and integration tests with an isolated test database strategy.
 
@@ -40,7 +42,7 @@ Use a `MediaStorage` interface with two implementations: AWS S3 for deployed env
 - API unit tests and integration tests.
 - `pnpm --filter @virtual-mandi/api typecheck`
 - `pnpm --filter @virtual-mandi/api test`
-- Exercise auth, lifecycle transitions, active feed filtering, pagination, and unauthorized requests.
+- Exercise auth, lifecycle transitions, typed post validation, BlogPost source/URL fields, active feed filtering, pagination, and unauthorized requests.
 
 ## Definition of done
 

@@ -37,7 +37,7 @@ Turn the Virtual Mandi idea into an implementation-ready v1 contract before code
 
 - Daily-content timezone is `Asia/Kolkata` (IST).
 - Mobile users self-register with email and password.
-- Development and tests use a local media-storage adapter; deployed environments use AWS S3.
+- Development and tests use LocalStack S3 in Docker; deployed environments use AWS S3.
 - Content is multilingual. Each story may have multiple translations, with English as the required fallback.
 - The mobile feed is filtered by language, location, and category.
 - Authentication uses bearer access tokens with API-managed refresh/revocation behavior.
@@ -48,7 +48,8 @@ Turn the Virtual Mandi idea into an implementation-ready v1 contract before code
 
 - The initial supported mobile locales and the exact location hierarchy still need to be selected during the shared-contracts plan.
 - The API token expiry and refresh-token storage details should be finalized in the backend security design.
-- The local S3-compatible implementation can be filesystem-backed or MinIO-backed; the adapter interface must remain the same.
+- LocalStack Docker image/version and the initial supported mobile locales can be finalized during implementation; the media-storage interface must remain stable.
+- `Post`/`BlogPost` schema details are defined in Plans 03–05; future post types must not break the top-level Post contract.
 
 Keep these implementation details behind configuration or interfaces so they can change without altering client contracts.
 
