@@ -43,4 +43,16 @@ Add jobs for install/cache, format, lint, typecheck, unit tests, Prisma validate
 
 ## Completion criteria
 
-The critical admin-to-API-to-mobile journey is automated, staging is reproducible, and known limitations—including crawler compliance, supported locales, and future post types—are documented.
+- [x] The critical admin-to-API-to-mobile journey is automated.
+- [x] Local/staging-style infrastructure and environment ownership are documented.
+- [x] Release and migration/backup procedures are documented.
+- [x] Known limitations—including crawler compliance, supported locales, and future post types—are documented.
+
+## Implementation notes
+
+- Added `.github/workflows/ci.yml` for dependency installation, Prisma validation/generation/migration, format/lint/typecheck/test/build, Expo Doctor, and iOS/Android bundle checks.
+- Added `scripts/integration-smoke.mjs` and `scripts/integration-local.mjs`; the local runner starts the API, waits for `/health`, runs the complete lifecycle smoke test, and terminates the server.
+- Added API CORS configuration, structured Fastify JSON logs with request IDs, PostgreSQL plus S3/LocalStack readiness checks, and production seed protection.
+- Corrected archived-post restore behavior so restore returns archived content to `PUBLISHED`; removed content restores to `DRAFT`.
+- Added `docs/environment.md`, `docs/operations.md`, and `docs/release-checklist.md` covering environment ownership, backups/migrations, S3 production controls, monitoring redaction, and release review.
+- Full browser automation, production error-monitoring provider wiring, and real crawler adapters remain deployment/product follow-ups rather than hidden assumptions.

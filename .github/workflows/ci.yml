@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: virtual_mandi
+          POSTGRES_USER: virtual_mandi
+          POSTGRES_PASSWORD: virtual_mandi_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U virtual_mandi -d virtual_mandi"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://virtual_mandi:virtual_mandi_ci@localhost:5432/virtual_mandi?schema=public
+      AWS_REGION: ap-south-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      S3_BUCKET: virtual-mandi-local
+      S3_ENDPOINT: http://localhost:4566
+      JWT_SECRET: ci-only-not-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma:validate
+      - run: pnpm prisma:generate
+      - run: pnpm db:migrate
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  mobile-bundles:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_API_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @virtual-mandi/mobile exec expo-doctor
+      - run: pnpm --filter @virtual-mandi/mobile typecheck
+      - run: pnpm --filter @virtual-mandi/mobile exec expo export --platform ios
+      - run: pnpm --filter @virtual-mandi/mobile exec expo export --platform android

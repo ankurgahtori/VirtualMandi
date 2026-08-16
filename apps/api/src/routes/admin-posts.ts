@@ -11,6 +11,7 @@ import {
   changeStatus,
   createBlogPost,
   getAdminPosts,
+  restorePost,
   updateBlogPost,
 } from '../services/post-service.js';
 
@@ -64,6 +65,8 @@ export const registerAdminPostRoutes = async (app: FastifyInstance) => {
     };
   app.post('/v1/admin/posts/:id/publish', { preHandler: requireAdmin }, transition('PUBLISHED'));
   app.post('/v1/admin/posts/:id/archive', { preHandler: requireAdmin }, transition('ARCHIVED'));
-  app.post('/v1/admin/posts/:id/restore', { preHandler: requireAdmin }, transition('DRAFT'));
+  app.post('/v1/admin/posts/:id/restore', { preHandler: requireAdmin }, async (request) =>
+    restorePost((request.params as { id: string }).id, request.auth!.userId),
+  );
   app.post('/v1/admin/posts/:id/remove', { preHandler: requireAdmin }, transition('REMOVED'));
 };

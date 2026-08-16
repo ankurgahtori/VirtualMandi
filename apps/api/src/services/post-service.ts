@@ -250,11 +250,19 @@ export const changeStatus = async (
   const post = await findPostById(id);
   if (!post) throw new Error('NOT_FOUND');
   const allowed: Record<typeof status, string[]> = {
-    PUBLISHED: ['DRAFT'],
+    PUBLISHED: ['DRAFT', 'ARCHIVED'],
     ARCHIVED: ['PUBLISHED'],
     DRAFT: ['ARCHIVED', 'REMOVED'],
     REMOVED: ['DRAFT', 'PUBLISHED', 'ARCHIVED'],
   };
   if (!allowed[status].includes(post.status)) throw new Error('INVALID_LIFECYCLE_TRANSITION');
   return transitionPostStatus(id, status, userId);
+};
+
+export const restorePost = async (id: string, userId: string) => {
+  const post = await findPostById(id);
+  if (!post) throw new Error('NOT_FOUND');
+  if (post.status === 'ARCHIVED') return transitionPostStatus(id, 'PUBLISHED', userId);
+  if (post.status === 'REMOVED') return transitionPostStatus(id, 'DRAFT', userId);
+  throw new Error('INVALID_LIFECYCLE_TRANSITION');
 };

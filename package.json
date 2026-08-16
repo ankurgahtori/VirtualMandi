@@ -22,6 +22,9 @@
     "db:migrate": "pnpm --filter @virtual-mandi/database db:migrate",
     "db:seed": "pnpm --filter @virtual-mandi/database db:seed",
     "db:reset": "pnpm --filter @virtual-mandi/database db:reset",
+    "integration:smoke": "node scripts/integration-smoke.mjs",
+    "integration:local": "node scripts/integration-local.mjs",
+    "ci:check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {

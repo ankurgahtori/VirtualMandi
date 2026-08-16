@@ -1,4 +1,9 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  HeadBucketCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { MediaDto } from '@virtual-mandi/shared';
 import { config } from '../config.js';
@@ -16,6 +21,10 @@ const client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? 'test',
   },
 });
+
+export const checkMediaStorage = async () => {
+  await client.send(new HeadBucketCommand({ Bucket: bucket }));
+};
 
 export interface MediaStorage {
   createUploadUrl(input: {

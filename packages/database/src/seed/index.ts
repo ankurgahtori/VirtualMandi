@@ -8,6 +8,11 @@ import { seedPost } from './post.seed.js';
 import { seedUsers } from './user.seed.js';
 
 const run = async () => {
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_SEED !== 'true') {
+    throw new Error(
+      'Production seeding is disabled. Use a reviewed migration or explicitly set ALLOW_PRODUCTION_SEED=true.',
+    );
+  }
   const admin = await seedUsers();
   await seedLocales();
   await seedLocations();
