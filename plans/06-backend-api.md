@@ -79,7 +79,15 @@ pnpm --filter @virtual-mandi/api build
 
 ## Completion criteria
 
-- API exposes the seeded BlogPost.
-- Admin can manage BlogPost lifecycle.
-- Mobile can authenticate and fetch the filtered published feed.
-- OpenAPI/contract output is generated or documented for client agents.
+- [x] API exposes the seeded BlogPost.
+- [x] Admin can manage BlogPost lifecycle.
+- [x] Mobile can authenticate and fetch the filtered published feed.
+- [x] API contract is documented for client agents.
+
+## Implementation notes
+
+- Added Fastify app/server/configuration, request IDs, consistent error envelopes, health/readiness endpoints, bearer access tokens, hashed rotating refresh sessions, logout revocation, admin role checks, and authentication rate limiting.
+- Added public feed/detail routes with locale fallback and published-only visibility, plus admin BlogPost CRUD, lifecycle routes, and presigned S3/LocalStack upload URLs.
+- Added DTO mapping so database records and password/token internals never leave the API boundary.
+- API contract is documented in `apps/api/API.md`.
+- Focused route tests and Docker-backed smoke tests pass. Full endpoint integration coverage remains a follow-up as admin/mobile clients are implemented.

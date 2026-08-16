@@ -1,1 +1,2 @@
-export const appName = 'virtual-mandi-api';
+export { buildApp } from './app.js';
+export { config } from './config.js';
