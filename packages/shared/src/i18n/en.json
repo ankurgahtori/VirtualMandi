@@ -1,0 +1,33 @@
+{
+  "common": {
+    "appName": "Virtual Mandi",
+    "loading": "Loading",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "register": "Create account",
+    "login": "Log in",
+    "logout": "Log out"
+  },
+  "feed": {
+    "title": "Agriculture updates",
+    "empty": "No updates available",
+    "loadError": "We could not load updates"
+  },
+  "filters": {
+    "language": "Language",
+    "location": "Location",
+    "category": "Category",
+    "apply": "Apply filters",
+    "clear": "Clear filters"
+  },
+  "post": {
+    "readMore": "Read more",
+    "source": "Source",
+    "openLink": "Open source link"
+  }
+}

@@ -1,5 +1,9 @@
 # Plan 03 — Shared contracts and utilities
 
+## Status
+
+Implemented. The shared package now exports typed post/auth/feed/ingestion contracts, runtime schemas, locale resources, IST date helpers, and tests.
+
 ## Objective
 
 Define the stable contracts consumed by API, admin, and mobile before those clients are implemented.

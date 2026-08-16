@@ -4,7 +4,7 @@ Virtual Mandi is a multilingual agricultural content platform with an Expo mobil
 
 ## Current status
 
-Plan 02 (monorepo foundation) is implemented. Start Docker Desktop and run `pnpm infra:up` to validate the PostgreSQL and LocalStack containers. Prisma, API, admin, and mobile features are intentionally not implemented yet.
+Plans 02 (monorepo foundation) and 03 (shared contracts) are implemented. Start Docker Desktop and run `pnpm infra:up` to validate the PostgreSQL and LocalStack containers. Prisma, API, admin, and mobile features are intentionally not implemented yet.
 
 ## Prerequisites
 
