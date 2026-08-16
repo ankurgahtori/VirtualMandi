@@ -1,0 +1,21 @@
+{
+  "name": "@virtual-mandi/database",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "tsc --noEmit --watch",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test",
+    "prisma:validate": "prisma validate --schema ../../prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema ../../prisma/schema.prisma",
+    "db:migrate": "prisma migrate deploy --schema ../../prisma/schema.prisma",
+    "db:seed": "node ../../scripts/seed-placeholder.mjs",
+    "db:reset": "prisma migrate reset --schema ../../prisma/schema.prisma --force"
+  }
+}

@@ -1,0 +1,42 @@
+node_modules/
+.pnpm-store/
+.turbo/
+dist/
+build/
+.next/
+.expo/
+.expo-shared/
+coverage/
+*.log
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+.aws/
+
+# Local infrastructure data
+postgres-data/
+localstack-data/
+.docker/
+
+# Prisma generated/runtime files
+prisma/generated/
+
+# Expo/native credentials
+*.p8
+*.p12
+*.mobileprovision
+*.keystore
+*.jks
+android/.gradle/
+android/local.properties
+ios/Pods/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store

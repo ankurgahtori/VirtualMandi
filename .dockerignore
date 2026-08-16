@@ -1,0 +1,9 @@
+node_modules
+.pnpm-store
+.turbo
+.git
+.env*
+coverage
+dist
+.next
+.expo

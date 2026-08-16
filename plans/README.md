@@ -28,19 +28,19 @@ These plans are ordered for one-at-a-time implementation by separate agents. Com
 
 ## Sequence
 
-| Order | Plan | Depends on | Scope |
-|---:|---|---|---|
-| 0 | [Git repository setup](./00-git-repository-setup.md) | None | Initialize Git, ignore secrets, commit and push planning baseline |
-| 1 | [Product scope and decisions](./01-product-scope-and-decisions.md) | 0 | Confirm v1 behavior and domain boundaries |
-| 2 | [Monorepo foundation](./02-monorepo-foundation.md) | 1 | Workspace engine, Docker development infrastructure, app/package layout, scripts, quality tooling |
-| 3 | [Shared contracts and utilities](./03-shared-contracts-and-utilities.md) | 2 | DTOs, post types, validation, translations, constants, API contracts |
-| 4 | [Prisma data layer](./04-prisma-data-layer.md) | 2, 3 | Root schema, Post/BlogPost models, localization/filter models, migrations |
-| 5 | [Content ingestion and seeding](./05-content-ingestion-and-seeding.md) | 3, 4 | Crawler normalization, LocalStack fixtures, ordered seeds, seeded BlogPost |
-| 6 | [Backend API](./06-backend-api.md) | 3–5 | Self-registration, bearer auth, feed, post management, S3 boundary |
-| 7 | [Mobile environment](./07-mobile-environment-setup.md) | 2 | Expo/native prerequisites and environment configuration |
-| 8 | [Mobile application](./08-mobile-application-v1.md) | 3, 6, 7 | Multilingual Inshorts-style feed and media playback |
-| 9 | [Admin website](./09-admin-website-v1.md) | 3, 5, 6 | English dashboard, BlogPost management, multilingual authoring, source visibility |
-| 10 | [Integration and release hardening](./10-integration-quality-and-release.md) | 4–9 | E2E checks, CI, observability, deployment readiness |
+| Order | Plan                                                                         | Depends on | Scope                                                                                             |
+| ----: | ---------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------- |
+|     0 | [Git repository setup](./00-git-repository-setup.md)                         | None       | Initialize Git, ignore secrets, commit and push planning baseline                                 |
+|     1 | [Product scope and decisions](./01-product-scope-and-decisions.md)           | 0          | Confirm v1 behavior and domain boundaries                                                         |
+|     2 | [Monorepo foundation](./02-monorepo-foundation.md)                           | 1          | Workspace engine, Docker development infrastructure, app/package layout, scripts, quality tooling |
+|     3 | [Shared contracts and utilities](./03-shared-contracts-and-utilities.md)     | 2          | DTOs, post types, validation, translations, constants, API contracts                              |
+|     4 | [Prisma data layer](./04-prisma-data-layer.md)                               | 2, 3       | Root schema, Post/BlogPost models, localization/filter models, migrations                         |
+|     5 | [Content ingestion and seeding](./05-content-ingestion-and-seeding.md)       | 3, 4       | Crawler normalization, LocalStack fixtures, ordered seeds, seeded BlogPost                        |
+|     6 | [Backend API](./06-backend-api.md)                                           | 3–5        | Self-registration, bearer auth, feed, post management, S3 boundary                                |
+|     7 | [Mobile environment](./07-mobile-environment-setup.md)                       | 2          | Expo/native prerequisites and environment configuration                                           |
+|     8 | [Mobile application](./08-mobile-application-v1.md)                          | 3, 6, 7    | Multilingual Inshorts-style feed and media playback                                               |
+|     9 | [Admin website](./09-admin-website-v1.md)                                    | 3, 5, 6    | English dashboard, BlogPost management, multilingual authoring, source visibility                 |
+|    10 | [Integration and release hardening](./10-integration-quality-and-release.md) | 4–9        | E2E checks, CI, observability, deployment readiness                                               |
 
 ## Recommended working path to a usable product
 

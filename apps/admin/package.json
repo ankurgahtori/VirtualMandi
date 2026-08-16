@@ -1,0 +1,13 @@
+{
+  "name": "@virtual-mandi/admin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "tsc --noEmit --watch",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test"
+  }
+}

@@ -1,5 +1,9 @@
 # Plan 02 — Monorepo foundation
 
+## Status
+
+Implemented in the repository. Static workspace and Compose validation pass; runtime container validation is pending Docker Desktop being started on the developer machine.
+
 ## Objective
 
 Create the workspace and local infrastructure required by every later plan.

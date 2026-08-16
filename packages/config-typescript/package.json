@@ -1,0 +1,8 @@
+{
+  "name": "@virtual-mandi/config-typescript",
+  "private": true,
+  "version": "0.1.0",
+  "exports": {
+    "./base.json": "./base.json"
+  }
+}
