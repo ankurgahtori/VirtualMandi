@@ -1,44 +1,94 @@
 # Plan 03 — Shared contracts and utilities
 
-## Goal
+## Objective
 
-Create platform-neutral code that is authored once and consumed by the API, admin website, and mobile app.
+Define the stable contracts consumed by API, admin, and mobile before those clients are implemented.
 
-## Scope
+## Files to create
 
-Implement `packages/shared` with:
+Under `packages/shared/src/`:
 
-- `PostType` and lifecycle/source enums/constants; v1 supports `BLOG_POST` with sources `WHATSAPP`, `WEBSITE`, and `MANUAL`.
-- Supported locale, language, category, and location identifiers/conventions.
-- Shared identifiers, `Asia/Kolkata` daily-boundary rules, and timestamp conventions.
-- `Post` and `BlogPost` summary/detail DTOs for feed and admin use cases, including localized fields, English fallback metadata, source, image/media, and external redirection URL.
-- Auth request/response DTOs.
-- Runtime validation schemas for API boundaries (prefer an existing workspace dependency such as Zod).
-- API error envelope and pagination/cursor types.
-- Safe date/URL/media helpers that do not depend on Node, DOM, or React Native APIs.
-- Mobile static-translation organization with namespaced locale resources such as `en.json` and `hi.json`, separated into common and page-level keys.
-- Translation lookup/fallback utility: requested locale -> configured fallback -> English.
-- Export maps that make public imports explicit.
-- Add crawler input/output schemas for normalized BlogPost ingestion and seed data.
-- Unit tests for schemas, serialization edge cases, locale fallback, filter validation, Post type discrimination, and source validation.
+```text
+constants/post.ts
+constants/locales.ts
+constants/lifecycle.ts
+schemas/auth.ts
+schemas/post.ts
+schemas/ingestion.ts
+schemas/feed.ts
+dtos/auth.ts
+dtos/post.ts
+dtos/feed.ts
+dtos/errors.ts
+i18n/en.json
+i18n/hi.json
+i18n/index.ts
+dates/ist.ts
+media/types.ts
+index.ts
+```
 
-## Domain shape to support
+Exact filenames may vary, but exports must remain explicit from `src/index.ts`.
 
-The shared domain should expose a top-level `Post` with a discriminating `type`, beginning with `BLOG_POST`. Keep type-specific fields in the BlogPost DTO and leave room for future post types. A BlogPost includes localized title/content, image/media, external redirection URL, source, language/category/location fields, publication timestamps, and lifecycle metadata without exposing storage implementation details.
+## Domain contracts
 
-## Constraints
+Define enums/constants:
 
-- Do not import Prisma, Fastify, Next.js, Expo, React, filesystem APIs, or secrets.
-- Keep DTOs separate from database models; clients should not receive internal fields by accident.
-- Treat all external input as untrusted and validate it at the boundary.
+- `PostType`: `BLOG_POST`
+- `PostStatus`: `DRAFT`, `PUBLISHED`, `ARCHIVED`, `REMOVED`
+- `PostSource`: `WHATSAPP`, `WEBSITE`, `MANUAL`
+- Locale identifiers and fallback locale (`en-IN`/`en`, then `hi-IN`/`hi` as selected)
 
-## Validation
+Define discriminated DTOs:
 
-- `pnpm --filter @virtual-mandi/shared test`
-- `pnpm typecheck`
-- Verify API, admin, and mobile packages can import the package without platform-specific compiler errors.
+```ts
+type PostSummary = {
+  id: string;
+  type: PostType;
+  status: PostStatus;
+  createdAt: string;
+  publishedAt?: string;
+  categoryId?: string;
+  locationIds: string[];
+};
 
-## Definition of done
+type BlogPostDetail = PostSummary & {
+  type: 'BLOG_POST';
+  title: string;
+  content: string;
+  image?: MediaDto;
+  externalRedirectUrl?: string;
+  source: PostSource;
+  requestedLocale: string;
+  resolvedLocale: string;
+  isEnglishFallback: boolean;
+};
+```
 
-- Shared exports are documented and stable enough for API/client implementation.
-- Tests cover valid payloads, invalid payloads, optional media, and lifecycle transitions represented in DTOs.
+Use ISO strings at HTTP boundaries. Keep database records and Prisma types out of this package.
+
+## Validation rules
+
+- Title and content are required for each translation.
+- English translation is required before publishing.
+- `externalRedirectUrl`, when present, must be an absolute `http`/`https` URL.
+- `source` must be the enum value.
+- Feed filters validate locale, category, location, cursor, and page size.
+- Ingestion input rejects missing stable identity/source/content and returns structured field errors.
+
+## Localization
+
+- Static mobile strings live in locale JSON files with namespaces such as `common`, `auth`, `feed`, `filters`, and `post`.
+- Provide `getMessage(locale, key)` with requested-locale → configured fallback → English lookup.
+- Missing translations must be detectable in tests; do not silently return the key in production without a fallback.
+
+## Tests
+
+Test schemas, discriminated post parsing, English publish requirement, URL safety, source enum, cursor validation, locale fallback, date serialization, and ingestion normalization inputs.
+
+## Completion criteria
+
+- API, admin, and mobile can import shared contracts.
+- All public exports are documented in package README.
+- No Node, Prisma, DOM, React, Expo, filesystem, or secret dependency enters the package.
+- Later agents do not define duplicate post/auth/filter types.

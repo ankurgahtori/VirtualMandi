@@ -1,49 +1,63 @@
 # Plan 04 — Prisma data layer
 
-## Goal
+## Objective
 
-Define the PostgreSQL schema and a reusable, server-safe Prisma package while keeping generated database code out of client bundles.
+Implement the PostgreSQL schema, migrations, server-only Prisma package, and query helpers for the typed-post domain.
 
-## Scope
+## Files and ownership
 
-- Add `prisma/schema.prisma` at the repository root.
-- Configure PostgreSQL through `DATABASE_URL` and document local development setup, with `Asia/Kolkata` as the application timezone convention.
-- Model at minimum:
-  - users/accounts
-  - refresh sessions or refresh tokens
-  - `Post` as the top-level entity with `type` enum, initially `BLOG_POST`
-  - `BlogPost` as a one-to-one type-specific detail entity
-  - BlogPost title/content translations with language and required English fallback
-  - BlogPost image/media reference, external redirection URL, and source enum (`WHATSAPP`, `WEBSITE`, `MANUAL`)
-  - publication/lifecycle metadata and crawler provenance/deduplication fields
-  - media assets and media variants/metadata as needed
-  - categories and location hierarchy/filter relations
-  - users/accounts and self-registration fields
-  - `createdAt` on every model; `updatedAt` on mutable models; soft deletion/archive metadata
-- Add indexes for active feed ordering, lifecycle filtering, email lookup, publication date, language, location, and category.
-- Add migrations and a deterministic, idempotent development seed runner.
-- Configure `packages/database` to export the Prisma client, lifecycle-safe helpers, transaction utilities, and seed orchestration entry points.
-- Add graceful client shutdown and a development-friendly singleton pattern.
-- Add a checked-in schema and migration policy; do not check in secrets or production data.
-- Add ordered seed modules, for example `user.seed.ts`, `locale.seed.ts`, `location.seed.ts`, `category.seed.ts`, `media.seed.ts`, `post.seed.ts`, and `blog-post.seed.ts`, with explicit ordering and upsert/idempotency rules so foreign keys always exist before dependents. The seed must create at least one usable English BlogPost.
-- Define `pnpm db:seed`/`npm run seed` behavior as migrate/prepare database first, then execute seed modules in order; make reset and seed behavior explicit for development only.
+- `prisma/schema.prisma`: only schema source of truth.
+- `prisma/migrations/`: committed migration history.
+- `packages/database/src/client.ts`: Prisma singleton/shutdown.
+- `packages/database/src/repositories/post-repository.ts`: typed post queries.
+- `packages/database/src/repositories/user-repository.ts`: auth queries.
+- `packages/database/src/seed/`: seed runner and ordered modules.
+- `packages/database/src/index.ts`: server-only exports.
 
-## Important boundary
+## Required models
 
-Only `apps/api` and server-side packages may import `@virtual-mandi/database`. The admin browser bundle and React Native bundle consume shared DTOs, never Prisma Client.
+Implement the equivalent of:
 
-## Validation
+- `User`: id, email unique, passwordHash, role, createdAt, updatedAt, optional disabledAt.
+- `RefreshSession`: id, userId, tokenHash, expiresAt, revokedAt, createdAt, updatedAt, device metadata.
+- `Post`: id, type, status, createdAt, updatedAt, publishedAt, archivedAt, removedAt, createdById, updatedById, stable ingestion identity.
+- `BlogPost`: postId unique, image/media reference, externalRedirectUrl, source, crawler provenance fields.
+- `BlogPostTranslation`: blogPostId, locale/language, title, content, unique `(blogPostId, locale)`, createdAt, updatedAt.
+- `Locale`, `Category`, `Location`, and post-to-category/location relations.
+- `MediaAsset`: id, provider, bucket, objectKey, mimeType, size, public/presigned URL metadata, createdAt.
 
-- Start the repository's PostgreSQL Docker image with `docker compose up -d postgres` and wait for its health check.
-- `pnpm prisma validate`
-- `pnpm prisma generate`
-- `pnpm prisma migrate deploy`
-- `pnpm db:seed` and the documented `npm run seed` equivalent
-- Run the seed command repeatedly and confirm it does not duplicate records or violate foreign-key constraints.
-- `pnpm --filter @virtual-mandi/database typecheck`
+Use explicit foreign-key behavior. Prefer soft deletion and status transitions over physical deletes. Add indexes for email, status/publishedAt, type, source, locale, category, location, and ingestion identity.
 
-## Definition of done
+## Seed ordering
 
-- A fresh database can be migrated and seeded reproducibly.
-- Generated client imports work from the API package.
-- Soft-delete/archive behavior, Post type handling, BlogPost relations, and active-feed queries are covered by tests or repository helpers.
+The seed runner must call modules in this order and fail with a named module if a module errors:
+
+```text
+user → locale → location → category → media → post → blogPost → translations → publish/filter relations
+```
+
+Every module must use stable IDs or natural-key upserts. `post.seed.ts` creates a `BLOG_POST`; `blog-post.seed.ts` attaches its details; translation seed creates English content; final seed publishes it. A second run must keep the same IDs/counts.
+
+## Commands
+
+```bash
+pnpm infra:up
+pnpm prisma:validate
+pnpm prisma:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm db:reset   # development only; explicit destructive warning
+```
+
+`db:migrate` must use deployable migrations, not silently use `db push`.
+
+## Tests
+
+Use Docker PostgreSQL or an isolated test database. Test schema migration, seed idempotency, English publish constraint, Post/BlogPost relation, status transitions, feed filters, translation fallback, and soft removal.
+
+## Completion criteria
+
+- Fresh Docker PostgreSQL migrates successfully.
+- Seed creates at least one published English BlogPost with image/media reference, external URL, source, category, location, and `createdAt`.
+- API can import database package; browser/mobile cannot.
+- Migration and seed commands are documented and repeatable.

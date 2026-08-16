@@ -1,60 +1,54 @@
-# Plan 01 — Product scope and decisions
+# Plan 01 — Product scope and implementation contract
 
-## Goal
+## Objective
 
-Turn the Virtual Mandi idea into an implementation-ready v1 contract before code is generated.
+Lock the v1 behavior so implementation agents do not invent incompatible models or screens.
 
-## V1 user journeys
+## Product flow to implement first
 
-### Farmer/mobile user
+The first demonstrable milestone is:
 
-- Sign in with email and password.
-- Receive a daily, vertically swiped feed of agricultural stories.
-- Read text stories.
-- Play text stories with background music.
-- Watch video stories with basic play/pause and progress controls.
-- Move between stories without losing the current feed position.
+1. Docker PostgreSQL and LocalStack start.
+2. Prisma migration creates the schema.
+3. Ordered seed creates one published English `BlogPost`.
+4. Admin signs in and sees the seeded post, including `createdAt`, source, and external URL.
+5. Admin creates/edits/publishes another `BlogPost`.
+6. Mobile signs in and receives the published post feed.
+7. Mobile applies language/location/category filters and opens the external URL.
 
-### Admin/editor
+Music, video, automated crawling, and additional post types must not block this text-post vertical slice.
 
-- Sign in with email and password.
-- Create and edit content.
-- Upload or register media through a defined media-storage boundary.
-- Publish content for the feed.
-- Archive content so it is no longer in the active feed but remains recoverable.
-- Remove content using a reversible soft-delete in v1.
-- View content by lifecycle state.
+## Domain decisions
 
-## Explicit non-goals for v1
+- Top-level entity: `Post`.
+- First type: `PostType.BLOG_POST`.
+- Type detail: one-to-one `BlogPost`.
+- BlogPost fields: localized title/content, image/media reference, `externalRedirectUrl`, `source`, category/location relations, publication/lifecycle metadata.
+- `source`: `WHATSAPP`, `WEBSITE`, `MANUAL`.
+- Every model has `createdAt`; mutable models also have `updatedAt`; database timestamps are UTC.
+- Daily-content rules use `Asia/Kolkata`.
+- States: `DRAFT`, `PUBLISHED`, `ARCHIVED`, `REMOVED`; removal is soft deletion.
+- English translation is required for a publishable post. Requested language falls back to English.
+- Mobile feed filters: language, location, category.
+- Mobile users self-register with email/password. Admin/editor access is role protected.
+- Authentication uses bearer access tokens; refresh/revocation is server-managed.
+- Admin UI is English in v1. Mobile UI uses namespaced locale JSON files, beginning with English and Hindi.
+- Development uses Docker PostgreSQL and LocalStack S3; production uses managed PostgreSQL and AWS S3.
 
-- Social login, phone OTP, and multi-factor authentication.
-- Comments, likes, follows, notifications, recommendations, search, and personalization.
-- Native media transcoding pipeline.
-- Payments or marketplace transactions.
-- Multi-tenant organizations and granular editorial roles.
+## Out of scope
 
-## Confirmed v1 decisions
+Social login/OTP, comments, likes, follows, recommendations, search, payments, notifications, advanced editorial roles, automatic translation, transcoding, and WhatsApp API integration are not v1 blockers.
 
-- Daily-content timezone is `Asia/Kolkata` (IST).
-- Mobile users self-register with email and password.
-- Development and tests use LocalStack S3 in Docker; deployed environments use AWS S3.
-- Content is multilingual. Each story may have multiple translations, with English as the required fallback.
-- The mobile feed is filtered by language, location, and category.
-- Authentication uses bearer access tokens with API-managed refresh/revocation behavior.
-- The admin website is English in v1, while mobile static strings are organized by locale and namespace, for example `en.json` and `hi.json` with common/page sections.
-- Development seed data is created through ordered, repeatable seed modules to preserve foreign-key dependencies.
+## Required decisions during implementation
 
-## Remaining implementation-level choices
+Choose and record:
 
-- The initial supported mobile locales and the exact location hierarchy still need to be selected during the shared-contracts plan.
-- The API token expiry and refresh-token storage details should be finalized in the backend security design.
-- LocalStack Docker image/version and the initial supported mobile locales can be finalized during implementation; the media-storage interface must remain stable.
-- `Post`/`BlogPost` schema details are defined in Plans 03–05; future post types must not break the top-level Post contract.
+- Initial mobile locales, defaulting to `en-IN` and `hi-IN` if no further decision is supplied.
+- Location hierarchy, defaulting to country/state/district if no further decision is supplied.
+- Access-token and refresh-token expiry.
+- Whether image URL is a public CDN URL or a media asset ID resolved by the API; prefer media asset IDs.
 
-Keep these implementation details behind configuration or interfaces so they can change without altering client contracts.
+## Completion criteria
 
-## Definition of done
-
-- The unresolved decisions above are answered or recorded as accepted defaults.
-- Content states and ownership rules are agreed.
-- The API and client plans can proceed without inventing product behavior.
+- Product behavior above is written into shared DTOs and tests.
+- Any implementation-level defaults are recorded in the relevant plan and README.

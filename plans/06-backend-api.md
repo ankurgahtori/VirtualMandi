@@ -1,51 +1,85 @@
 # Plan 06 — Backend API
 
-## Goal
+## Objective
 
-Build the Node.js TypeScript API that authenticates users, manages typed posts, and serves the mobile feed.
+Build the Fastify API required for authentication, admin BlogPost management, seeded data visibility, and the mobile feed.
 
-## Scope
+## Files and modules
 
-- Bootstrap `apps/api` with Fastify, structured logging, configuration validation, CORS, and centralized error handling.
-- Implement self-registration and email/password authentication:
-  - password hashing with a modern adaptive algorithm
-  - registration, login, logout, and bearer access-token issuance
-  - refresh-token/session rotation and revocation behind the bearer-token API
-  - safe responses that do not reveal whether an email exists
-  - rate limiting and basic brute-force protections
-- Implement authorization for authenticated users and admin/editor operations.
-- Implement typed post endpoints for create, update, list by state/type/source, publish, archive, restore, and soft-remove; implement BlogPost first.
-- Implement the mobile feed endpoint with stable ordering, pagination, and only published/non-deleted posts; return BlogPost data for `BLOG_POST` items.
-- Support feed filtering by requested language, location, and category, with English translation fallback when a requested translation is unavailable.
-- Apply `Asia/Kolkata` consistently to daily-content boundaries and document UTC storage versus IST presentation/query behavior.
-- Return shared DTOs and validation errors from `@virtual-mandi/shared`.
-- Add OpenAPI documentation or an equivalent generated API contract.
-- Expose admin views containing BlogPost source and external redirection URL.
-- Keep crawler ingestion behind the Plan 05 ingestion service; API endpoints may trigger or review ingestion results but crawler adapters must not access Prisma directly.
-- Add health/readiness endpoints and database error handling.
-- Add unit and integration tests with an isolated test database strategy.
+```text
+apps/api/src/server.ts
+apps/api/src/app.ts
+apps/api/src/config.ts
+apps/api/src/plugins/auth.ts
+apps/api/src/plugins/error-handler.ts
+apps/api/src/routes/auth.ts
+apps/api/src/routes/posts.ts
+apps/api/src/routes/admin-posts.ts
+apps/api/src/services/auth-service.ts
+apps/api/src/services/post-service.ts
+apps/api/src/services/media-service.ts
+apps/api/src/repositories/...
+apps/api/test/...
+```
 
-## Media boundary
+## HTTP contract
 
-Use a `MediaStorage` interface with two implementations: AWS S3 for deployed environments and LocalStack S3 for development/tests. The API must not hard-code a provider or expose AWS credentials to admin/mobile clients. Configure the LocalStack endpoint, region, bucket, and dummy development credentials through environment variables. Prefer presigned upload/download flows where applicable.
+Implement and document at minimum:
 
-## Security requirements
+- `POST /v1/auth/register`
+- `POST /v1/auth/login`
+- `POST /v1/auth/refresh`
+- `POST /v1/auth/logout`
+- `GET /v1/me`
+- `GET /v1/feed/posts?locale=&locationId=&categoryId=&cursor=&limit=`
+- `GET /v1/posts/:id`
+- `GET /v1/admin/posts?...`
+- `POST /v1/admin/posts` for BlogPost first
+- `PATCH /v1/admin/posts/:id`
+- `POST /v1/admin/posts/:id/publish`
+- `POST /v1/admin/posts/:id/archive`
+- `POST /v1/admin/posts/:id/restore`
+- `POST /v1/admin/posts/:id/remove`
+- `GET /health` and `GET /ready`
 
-- Never return password hashes or raw refresh tokens.
-- Validate body, params, query, and uploaded/media URLs.
-- Enforce ownership/role checks on admin mutations.
-- Configure production CORS and bearer-token behavior explicitly; do not use permissive defaults silently.
-- Validate environment-specific configuration for database, bearer-token signing/verification, AWS S3/LocalStack endpoint, bucket, region, and credentials.
+Use shared request schemas and DTOs. Return a consistent error envelope with request ID, machine-readable code, message, and field errors. Never return password hashes, token values, or internal Prisma records.
 
-## Validation
+## Auth behavior
 
-- API unit tests and integration tests.
-- `pnpm --filter @virtual-mandi/api typecheck`
-- `pnpm --filter @virtual-mandi/api test`
-- Exercise auth, lifecycle transitions, typed post validation, BlogPost source/URL fields, active feed filtering, pagination, and unauthorized requests.
+- Normalize email and hash passwords with a modern adaptive algorithm.
+- Registration must be safe against account enumeration and duplicate email races.
+- Access tokens are bearer tokens in `Authorization: Bearer <token>`.
+- Store only hashed refresh tokens/sessions; rotate and revoke on refresh/logout.
+- Add role checks for admin routes and rate limiting for auth routes.
+- Define expiry values in validated environment configuration.
 
-## Definition of done
+## Post behavior
 
-- Admin and mobile clients have documented endpoints they can use without direct database access.
-- Auth and content lifecycle behavior is covered by automated tests.
-- The API can run locally against the Prisma schema and provides operational health checks.
+- Admin can create/update BlogPost translations, image/media, external URL, source, categories, and locations.
+- Publishing requires valid English title/content and valid lifecycle state.
+- Feed returns only `PUBLISHED`, non-removed posts and resolves requested locale → English.
+- Admin list includes `createdAt`, source, external URL, type, status, crawler provenance, and missing translations.
+- Use cursor pagination with deterministic ordering, for example `publishedAt DESC, id DESC`.
+
+## Media behavior
+
+Create a `MediaStorage` interface. Use LocalStack S3 for local/test and AWS S3 in production. The API owns credentials and can issue presigned upload/download URLs. Browser/mobile receive URLs or media DTOs, never AWS credentials.
+
+## Tests and validation
+
+- Unit-test auth, post lifecycle, locale fallback, filter construction, URL validation, and authorization.
+- Integration-test every listed endpoint against Docker PostgreSQL and LocalStack.
+- Run:
+
+```bash
+pnpm --filter @virtual-mandi/api typecheck
+pnpm --filter @virtual-mandi/api test
+pnpm --filter @virtual-mandi/api build
+```
+
+## Completion criteria
+
+- API exposes the seeded BlogPost.
+- Admin can manage BlogPost lifecycle.
+- Mobile can authenticate and fetch the filtered published feed.
+- OpenAPI/contract output is generated or documented for client agents.

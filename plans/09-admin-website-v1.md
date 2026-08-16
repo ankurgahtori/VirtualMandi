@@ -1,38 +1,42 @@
 # Plan 09 — Admin website v1
 
-## Goal
+## Objective
 
-Deliver a protected browser dashboard for managing typed agricultural posts, beginning with BlogPost.
+Build the English admin dashboard that proves the seeded BlogPost can be viewed and editorially managed.
 
-## Scope
+## Routes
 
-- Bootstrap `apps/admin` as a Next.js TypeScript application.
-- Implement email/password login and protected server/client routes according to the API session design.
-- Add post list with filters for type, draft, published, archived, removed, source, language, location, and category.
-- Add BlogPost create/edit form with title, image/media, content, external redirection URL, and source (`WHATSAPP`, `WEBSITE`, `MANUAL`).
-- Allow editors to author the same BlogPost in multiple languages, require English as the fallback version, and clearly show missing translations.
-- Show `createdAt`, source, external URL, post type, lifecycle state, and crawler provenance where available in the admin UI.
-- Add media upload/storage integration through the API's S3/local-media boundary; do not put AWS or storage secrets in the browser.
-- Add preview of each content kind before publishing.
-- Add explicit confirmation for publish, archive, restore, and remove actions.
-- Show validation, upload, authorization, and network errors clearly.
-- Add responsive layout and basic accessibility.
-- Add tests for route protection, BlogPost form validation, source/URL display, lifecycle actions, and API error handling.
+- `/login`
+- `/posts`
+- `/posts/new`
+- `/posts/[id]/edit`
+- optional `/posts/[id]/preview`
 
-## Constraints
+Protect all routes except login. Server-side and client-side API calls must use the API contract; browser code must not import Prisma or AWS credentials.
 
-- Browser code consumes shared DTOs and API contracts only.
-- Keep destructive behavior reversible in v1 through soft deletion.
-- Do not build advanced editorial roles unless approved in Plan 01/04.
+## BlogPost workflow
 
-## Validation
+- List posts by type, status, source, language, category, location, and date.
+- Display seeded post fields: title, image preview, `createdAt`, content excerpt, external URL, source, type, status, and translation completeness.
+- Create/edit English BlogPost first, then add translation tabs/sections for supported locales.
+- Require English title/content before publish.
+- Validate image/media and external URL before submission.
+- Show explicit actions and confirmation for publish, archive, restore, and soft-remove.
+- Show crawler provenance and duplicate/source warnings when present.
+- Use API-presigned media flow; never upload directly with long-lived AWS credentials.
 
-- Admin unit/component tests.
-- `pnpm --filter @virtual-mandi/admin typecheck`
-- Browser smoke test covering login, view seeded BlogPost, create draft, edit source/URL, publish, archive, restore, and remove.
-- Verify production build does not contain server secrets or Prisma code.
+## UI quality
 
-## Definition of done
+Use responsive English UI, keyboard-accessible forms, clear server validation errors, unsaved-change warning, loading states, optimistic updates only when rollback is safe, and an error boundary.
 
-- An authorized editor can manage the complete v1 content lifecycle from the website.
-- A non-authenticated visitor cannot access protected pages or mutate content.
+## Tests
+
+- Route protection and unauthenticated redirect.
+- Form schemas and English publish requirement.
+- Source/external URL/createdAt rendering.
+- CRUD/lifecycle action success and failure.
+- Seeded BlogPost browser smoke test.
+
+## Completion criteria
+
+An editor can log in, see the seeded BlogPost, create/edit/publish/archive/restore/remove a BlogPost, inspect source and external URL, and see missing translations without direct database access.

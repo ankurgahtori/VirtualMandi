@@ -1,32 +1,46 @@
 # Plan 10 — Integration, quality, and release hardening
 
-## Goal
+## Objective
 
-Make the first end-to-end slice dependable enough for staging and future independent agent work.
+Prove the complete system works together and document how to run it safely in staging/production.
 
-## Scope
+## End-to-end scenario
 
-- Add CI jobs for install, format check, lint, typecheck, unit tests, Prisma validation, and builds.
-- Add a disposable PostgreSQL integration-test workflow using the repository Docker image.
-- Add LocalStack S3 to integration tests and verify the same storage contract used by development.
-- Add API contract checks to detect drift between shared DTOs and clients.
-- Add end-to-end smoke coverage: seeded BlogPost appears in admin and mobile, admin creates/publishes a BlogPost, mobile retrieves it, admin archives it, and mobile no longer receives it.
-- Define environment variable documentation and staging/production secret handling.
-- Add structured logs, request IDs, health checks, and minimum error monitoring hooks.
-- Define database migration rollout and rollback guidance.
-- Add media hosting, CDN, caching, backup, retention, and privacy notes.
-- Verify crawler normalization and idempotent seed execution in CI.
-- Document production AWS S3 configuration separately from LocalStack development configuration.
-- Document release checklist and known v1 limitations.
+Against clean Docker PostgreSQL + LocalStack:
 
-## Validation
+1. Migrate and seed.
+2. Admin logs in and reads seeded BlogPost.
+3. Mobile registers/logs in and reads published feed.
+4. Admin creates a draft BlogPost with source, image, external URL, category, location, and English content.
+5. Admin publishes it.
+6. Mobile retrieves it with requested locale/filter.
+7. Admin archives it.
+8. Mobile no longer receives it.
+9. Admin restores it and mobile receives it again.
+10. Run seed twice and verify no duplicate records.
 
-- Run the full root validation pipeline in CI and locally where practical.
-- Run the end-to-end flow against a clean database.
-- Verify no secrets, local database files, generated client artifacts that should be ignored, or platform credentials are committed.
+## CI
 
-## Definition of done
+Add jobs for install/cache, format, lint, typecheck, unit tests, Prisma validate/generate, migration/integration tests, API/admin builds, and mobile typecheck/build checks appropriate to Expo. Start service containers or Compose with health checks. Do not use production credentials.
 
-- Staging deployment can be reproduced from documented steps.
-- The critical user journey is automated.
-- Remaining risks and follow-up features are recorded rather than hidden.
+## Operational requirements
+
+- Structured JSON logs and request IDs.
+- `/health` for process and `/ready` for database/storage dependencies.
+- Error monitoring hook with secrets/PII redaction.
+- Migration deploy procedure and backup/rollback guidance.
+- AWS S3 production bucket policy, encryption, lifecycle, CORS, CDN, and private/public URL decisions.
+- LocalStack configuration kept separate from staging/production.
+- Environment variable inventory with owner and exposure classification.
+
+## Release checklist
+
+- No secrets, tokens, dumps, signing keys, or generated credentials committed.
+- Production build contains no Prisma client in browser/mobile bundles.
+- CORS, bearer token, password hashing, rate limits, and upload limits reviewed.
+- Seed fixtures are development-only and production seed command is disabled or explicitly guarded.
+- Database backup and migration plan tested in staging.
+
+## Completion criteria
+
+The critical admin-to-API-to-mobile journey is automated, staging is reproducible, and known limitations—including crawler compliance, supported locales, and future post types—are documented.

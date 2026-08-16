@@ -1,36 +1,48 @@
 # Plan 00 — Git repository setup
 
-## Goal
+## Objective
 
-Initialize Virtual Mandi as a Git repository connected to the canonical GitHub remote before application implementation begins.
+Create a safe, collaborative Git baseline for the monorepo. This plan is already complete in the current repository; future agents should not repeat initialization or force-push.
 
-## Scope
+## Repository contract
 
-- Initialize Git in the repository root if it is not already initialized.
-- Configure the project remote as:
-  - `origin git@github.com:ankurgahtori/VirtualMandi.git`
-- Add repository-level `.gitignore` rules for Node, pnpm, Turbo, Expo/React Native, Next.js, Prisma artifacts, environment files, AWS credentials, IDE files, logs, and OS files.
-- Add safe environment templates such as `.env.example` and document that real values must never be committed.
-- Add all current planning files and the project-local skill.
-- Create the initial commit with a clear message.
-- Push the initial commit to the configured remote after confirming SSH authentication and the target branch.
+- Remote: `git@github.com:ankurgahtori/VirtualMandi.git`
+- Primary branch: `main`
+- Project-local agent skill: `.agents/skills/virtual-mandi/SKILL.md`
+- Plans: `plans/`
 
-## Safety requirements
+## Agent procedure
 
-- Inspect existing Git state before changing remotes or branches.
-- Do not overwrite an existing remote, branch, or user commit without explicit confirmation.
-- Never commit `.env`, private keys, AWS credentials, database dumps, signing certificates, or production data.
-- If the remote already contains commits, fetch and reconcile history safely instead of force-pushing.
+1. Run `git status --short --branch` and `git remote -v` before editing.
+2. Never reset, rebase, delete branches, change remotes, or force-push without explicit instruction.
+3. Keep each plan in a focused commit; do not commit generated build output, dependency folders, credentials, or databases.
+4. Use descriptive commit messages such as `feat(api): add blog post feed`.
+5. Push only the branch being worked on and report the commit hash.
+
+## Required repository protection
+
+Create or maintain `.gitignore` entries for `node_modules`, `.turbo`, build output, Expo/Next caches, Prisma generated artifacts when ignored by the chosen setup, `.env*` except safe templates, AWS credentials, Docker volumes, logs, IDE files, OS files, signing files, and database dumps.
+
+Safe templates may be committed:
+
+- `.env.example`
+- `apps/api/.env.example`
+- `apps/admin/.env.example`
+- `apps/mobile/.env.example`
+
+Templates must contain variable names and non-sensitive local placeholders only.
 
 ## Validation
 
-- `git remote -v`
-- `git status --short`
-- `git log --oneline -1`
-- Confirm the initial commit is visible on the intended remote branch.
+```bash
+git status --short --branch
+git remote -v
+git log --oneline -3
+git diff --check
+```
 
-## Definition of done
+## Completion criteria
 
-- The repository has a clean initial commit containing the planning baseline.
-- `origin` points to the supplied GitHub repository.
-- The remote contains the initial commit, unless authentication or remote-history conflicts require a documented handoff.
+- Git history is preserved.
+- The working tree is clean before handoff.
+- The agent reports changed files, validation, commit hash, and push status.

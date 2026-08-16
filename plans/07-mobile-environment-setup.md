@@ -1,34 +1,32 @@
 # Plan 07 — Mobile environment setup
 
-## Goal
+## Objective
 
-Prepare the development environment and Expo shell independently from implementing the Virtual Mandi experience.
+Create a launchable Expo shell that can consume shared contracts and reach the local API without exposing server credentials.
 
-## Scope
+## Implementation
 
-- Confirm supported Node.js, package manager, JavaScript runtime, and Expo SDK versions.
-- Bootstrap `apps/mobile` as an Expo React Native TypeScript app within the workspace.
-- Document iOS simulator, Android emulator, and physical-device workflows.
-- Configure environment variables for API base URL using Expo-safe public configuration; never place secrets in the app bundle.
-- Document that mobile development talks to the API running on the host/network, while API media tests use the Docker LocalStack endpoint; do not expose LocalStack credentials to mobile.
-- Add a typed mobile config loader with development/test validation.
-- Configure linting, formatting, TypeScript, and a basic test runner compatible with the workspace.
-- Add a placeholder screen proving the app launches and can resolve `@virtual-mandi/shared`.
-- Document when a development build is required instead of Expo Go (for example, native media or auth integrations).
+- Bootstrap `apps/mobile` with the selected Expo SDK and TypeScript.
+- Add navigation foundation and a placeholder route only; feature screens belong to Plan 08.
+- Add Expo-safe public API URL configuration. For a physical device, document host LAN IP; for Android emulator, document host alias; for iOS simulator, document localhost behavior.
+- Add secure storage dependency/configuration for later bearer refresh sessions.
+- Add `@virtual-mandi/shared` import and verify no Prisma/database dependency enters the bundle.
+- Add locale resource loading and a placeholder language switch.
+- Document Expo Go versus development build requirements for secure storage and media playback.
 
-## Constraints
+## Environment contract
 
-- Do not implement the feed, auth screens, navigation, or media playback here; those belong to Plan 06.
-- Do not import Prisma Client.
+Mobile receives only public values such as API base URL and default locale. It must never receive `DATABASE_URL`, AWS keys, LocalStack credentials, JWT signing secrets, or admin-only configuration.
 
-## Validation
+## Tests
 
-- Launch on the selected simulator/emulator or physical device.
-- Run mobile typecheck, lint, and tests.
-- Confirm API base URL configuration works in development and fails clearly when absent.
+- Typecheck, lint, test placeholder render.
+- Launch iOS simulator, Android emulator, and one physical-device path if available.
+- Verify missing/invalid API URL produces an actionable startup error.
 
-## Definition of done
+## Completion criteria
 
-- A new developer can follow the README and launch the mobile shell.
-- Workspace shared package imports work in React Native.
-- Native setup assumptions are documented for both iOS and Android.
+- `pnpm --filter @virtual-mandi/mobile start` launches.
+- Shared package resolves in Metro.
+- API URL can be configured per environment.
+- No server-only package is reachable from mobile imports.
