@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Virtual Mandi",
+    "slug": "virtual-mandi",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "virtualmandi",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.virtualmandi.app" },
+    "android": { "package": "com.virtualmandi.app" },
+    "plugins": ["expo-secure-store"]
+  }
+}
