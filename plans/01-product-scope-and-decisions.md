@@ -1,4 +1,4 @@
-# Plan 00 — Product scope and decisions
+# Plan 01 — Product scope and decisions
 
 ## Goal
 

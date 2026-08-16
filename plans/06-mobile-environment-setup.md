@@ -1,4 +1,4 @@
-# Plan 05 — Mobile environment setup
+# Plan 06 — Mobile environment setup
 
 ## Goal
 
@@ -10,6 +10,7 @@ Prepare the development environment and Expo shell independently from implementi
 - Bootstrap `apps/mobile` as an Expo React Native TypeScript app within the workspace.
 - Document iOS simulator, Android emulator, and physical-device workflows.
 - Configure environment variables for API base URL using Expo-safe public configuration; never place secrets in the app bundle.
+- Document that mobile development talks to the API running on the host/network, while API media tests use the Docker LocalStack endpoint; do not expose LocalStack credentials to mobile.
 - Add a typed mobile config loader with development/test validation.
 - Configure linting, formatting, TypeScript, and a basic test runner compatible with the workspace.
 - Add a placeholder screen proving the app launches and can resolve `@virtual-mandi/shared`.

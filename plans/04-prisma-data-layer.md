@@ -1,4 +1,4 @@
-# Plan 03 — Prisma data layer
+# Plan 04 — Prisma data layer
 
 ## Goal
 
@@ -31,7 +31,7 @@ Only `apps/api` and server-side packages may import `@virtual-mandi/database`. T
 
 ## Validation
 
-- Start a local PostgreSQL instance using the chosen repository-supported method.
+- Start the repository's PostgreSQL Docker image with `docker compose up -d postgres` and wait for its health check.
 - `pnpm prisma validate`
 - `pnpm prisma generate`
 - `pnpm prisma migrate deploy`

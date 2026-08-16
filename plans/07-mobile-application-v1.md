@@ -1,4 +1,4 @@
-# Plan 06 — Mobile application v1
+# Plan 07 — Mobile application v1
 
 ## Goal
 

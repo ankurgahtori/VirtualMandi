@@ -28,7 +28,7 @@ Use this skill for work in the Virtual Mandi repository. Read the relevant file 
 - Use `Asia/Kolkata` for daily-content rules unless a plan explicitly overrides it.
 - Keep multilingual content translations separate from static mobile locale resources, and provide English fallback behavior.
 - Preserve feed filters for language, location, and category across API and clients.
-- Keep AWS S3 behind a media-storage interface with a local development/test adapter.
+- Keep AWS S3 behind a media-storage interface; use LocalStack S3 in Docker for local development and tests.
 - Avoid committing secrets, real credentials, production data, or platform signing files.
 - Prefer interfaces for external services such as media storage, analytics, and notifications.
 

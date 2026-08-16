@@ -1,4 +1,4 @@
-# Plan 02 — Shared contracts and utilities
+# Plan 03 — Shared contracts and utilities
 
 ## Goal
 

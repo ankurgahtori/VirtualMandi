@@ -1,4 +1,4 @@
-# Plan 07 — Admin website v1
+# Plan 08 — Admin website v1
 
 ## Goal
 

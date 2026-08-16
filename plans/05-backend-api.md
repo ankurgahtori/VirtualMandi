@@ -1,4 +1,4 @@
-# Plan 04 — Backend API
+# Plan 05 — Backend API
 
 ## Goal
 
@@ -25,7 +25,7 @@ Build the Node.js TypeScript API that authenticates users, manages editorial con
 
 ## Media boundary
 
-Use a `MediaStorage` interface with two implementations: AWS S3 for deployed environments and a local filesystem or MinIO-compatible adapter for development/tests. The API must not hard-code a provider or expose AWS credentials to admin/mobile clients. Prefer presigned upload/download flows where applicable.
+Use a `MediaStorage` interface with two implementations: AWS S3 for deployed environments and LocalStack S3 for development/tests. The API must not hard-code a provider or expose AWS credentials to admin/mobile clients. Configure the LocalStack endpoint, region, bucket, and dummy development credentials through environment variables. Prefer presigned upload/download flows where applicable.
 
 ## Security requirements
 
@@ -33,7 +33,7 @@ Use a `MediaStorage` interface with two implementations: AWS S3 for deployed env
 - Validate body, params, query, and uploaded/media URLs.
 - Enforce ownership/role checks on admin mutations.
 - Configure production CORS and bearer-token behavior explicitly; do not use permissive defaults silently.
-- Validate environment-specific configuration for database, bearer-token signing/verification, S3, and local media storage.
+- Validate environment-specific configuration for database, bearer-token signing/verification, AWS S3/LocalStack endpoint, bucket, region, and credentials.
 
 ## Validation
 

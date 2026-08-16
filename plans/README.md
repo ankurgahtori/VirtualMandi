@@ -17,7 +17,8 @@ These plans are ordered for one-at-a-time implementation by separate agents. Com
 - **Content:** text, text with background music, and video; draft, published, archived, and soft-removed states
 - **Feed filters:** language, location, and category
 - **Localization:** each content item can have multiple language versions with English fallback; mobile static strings use namespaced `en.json`, `hi.json`, and future locale files
-- **Media:** AWS S3 in deployed environments, with a local filesystem/MinIO-compatible adapter for development and tests
+- **Development infrastructure:** Docker Compose with PostgreSQL and LocalStack containers
+- **Media:** AWS S3 in deployed environments, with LocalStack S3 for development and tests
 - **Seeds:** ordered, idempotent seed modules such as `user.seed.ts`, `category.seed.ts`, and `content.seed.ts`, executed through one deterministic seed runner after migrations
 
 > Prisma Client must never be bundled into React Native or browser code. Clients consume shared DTOs and validation/types; only server-side API code imports the database package.
@@ -28,7 +29,7 @@ These plans are ordered for one-at-a-time implementation by separate agents. Com
 |---:|---|---|---|
 | 0 | [Git repository setup](./00-git-repository-setup.md) | None | Initialize Git, ignore secrets, commit and push planning baseline |
 | 1 | [Product scope and decisions](./01-product-scope-and-decisions.md) | 0 | Confirm v1 behavior and domain boundaries |
-| 2 | [Monorepo foundation](./02-monorepo-foundation.md) | 1 | Workspace engine, app/package layout, scripts, quality tooling |
+| 2 | [Monorepo foundation](./02-monorepo-foundation.md) | 1 | Workspace engine, Docker development infrastructure, app/package layout, scripts, quality tooling |
 | 3 | [Shared contracts and utilities](./03-shared-contracts-and-utilities.md) | 2 | DTOs, validation, translations, constants, API contracts |
 | 4 | [Prisma data layer](./04-prisma-data-layer.md) | 2, 3 | Root schema, localization/filter models, migrations, ordered seeds |
 | 5 | [Backend API](./05-backend-api.md) | 3, 4 | Self-registration, bearer auth, feed, content management, S3 boundary |

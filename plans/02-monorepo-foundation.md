@@ -1,4 +1,4 @@
-# Plan 01 — Monorepo foundation
+# Plan 02 — Monorepo foundation
 
 ## Goal
 
@@ -19,6 +19,9 @@ Create the root workspace engine so three applications and shared packages can b
   - `prisma`
 - Add TypeScript base configuration and package-specific extensions.
 - Add consistent environment-file conventions and safe `.gitignore` rules.
+- Add Docker Compose development infrastructure with PostgreSQL and LocalStack services using pinned image tags selected during implementation.
+- Configure LocalStack S3 initialization for the development bucket, region, and test credentials; document container networking and health checks.
+- Provide commands for starting/stopping/resetting containers and persistent development volumes.
 - Add a root README explaining setup without committing secrets.
 - Add a minimal CI workflow that installs, validates, and builds workspace packages that exist at this stage.
 
@@ -26,7 +29,8 @@ Create the root workspace engine so three applications and shared packages can b
 
 - Keep package names scoped and consistent, for example `@virtual-mandi/shared` and `@virtual-mandi/database`.
 - Avoid adding app-specific domain types to the root config package.
-- Do not initialize generated Prisma output yet; that belongs to Plan 03.
+- Do not initialize generated Prisma output yet; that belongs to Plan 04.
+- Keep Docker volumes and local credentials out of Git.
 - Do not commit real `.env` values.
 
 ## Validation
@@ -36,6 +40,8 @@ Create the root workspace engine so three applications and shared packages can b
 - `pnpm typecheck`
 - `pnpm build`
 - Confirm Turborepo respects package dependency order.
+- `docker compose config`
+- `docker compose up -d postgres localstack` and verify both health checks.
 
 ## Definition of done
 
