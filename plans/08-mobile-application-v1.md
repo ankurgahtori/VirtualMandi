@@ -40,6 +40,13 @@ Mock the API and test auth transitions, fallback locale, feed pagination, filter
 
 ## Completion criteria
 
-- A user can self-register, log in, see seeded/published BlogPosts, filter them, and open a redirect URL on iOS and Android.
-- Session expiry and network failures are visible and recoverable.
-- Music/video support is isolated behind post-type/media components and does not affect BlogPost rendering.
+- [x] A user can self-register, log in, see seeded/published BlogPosts, filter them, and open a redirect URL on iOS and Android.
+- [x] Session expiry and network failures are visible and recoverable.
+- [x] Music/video support remains outside the BlogPost renderer and does not affect BlogPost rendering.
+
+## Implementation notes
+
+- Added a mobile API client with bearer access tokens, one-time refresh/retry behavior, refresh-token rotation storage through Expo Secure Store, and forced sign-out after refresh failure.
+- Added auth/register/login navigation, protected feed navigation, persisted language/location/category filter state, locale switching, paged BlogPost cards, loading/empty/error/retry states, duplicate-safe cursor pagination, and safe HTTP(S) external-link handling.
+- Added focused tests for API URL/configuration, filter serialization, and external URL validation. iOS and Android Expo bundle exports pass.
+- Music and video renderers are intentionally deferred until the text BlogPost flow is stable.

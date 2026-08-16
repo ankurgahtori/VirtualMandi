@@ -1,44 +1,57 @@
-import { useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getMessage } from '@virtual-mandi/shared';
+import { AuthProvider, useAuth } from './src/auth/auth-context';
 import { mobileConfig } from './src/config/env';
+import { LoginScreen, RegisterScreen } from './src/screens/auth-screens';
+import { FeedScreen } from './src/screens/feed-screen';
 
-type RootStackParamList = { Home: undefined };
-const Stack = createNativeStackNavigator<RootStackParamList>();
+type AuthStackParamList = { Login: undefined; Register: undefined };
+type AppStackParamList = { Feed: undefined };
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const AppStack = createNativeStackNavigator<AppStackParamList>();
 
-const HomeScreen = () => {
-  const [locale, setLocale] = useState(mobileConfig.defaultLocale);
+const AuthNavigator = () => (
+  <AuthStack.Navigator>
+    <AuthStack.Screen
+      name="Login"
+      options={{ title: getMessage(mobileConfig.defaultLocale, 'auth.login') }}
+    >
+      {({ navigation }) => <LoginScreen onRegister={() => navigation.navigate('Register')} />}
+    </AuthStack.Screen>
+    <AuthStack.Screen
+      name="Register"
+      options={{ title: getMessage(mobileConfig.defaultLocale, 'auth.register') }}
+    >
+      {({ navigation }) => <RegisterScreen onRegister={() => navigation.navigate('Login')} />}
+    </AuthStack.Screen>
+  </AuthStack.Navigator>
+);
+
+const AppNavigator = () => (
+  <AppStack.Navigator>
+    <AppStack.Screen
+      name="Feed"
+      component={FeedScreen}
+      options={{ title: getMessage(mobileConfig.defaultLocale, 'feed.title') }}
+    />
+  </AppStack.Navigator>
+);
+
+const RootNavigator = () => {
+  const { status } = useAuth();
+  if (status === 'loading') return null;
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{getMessage(locale, 'common.appName')}</Text>
-      <Text>{getMessage(locale, 'feed.title')}</Text>
-      <Text style={styles.endpoint}>API: {mobileConfig.apiBaseUrl}</Text>
-      <Button
-        title={getMessage(locale, 'filters.language')}
-        onPress={() => setLocale(locale === 'en-IN' ? 'hi-IN' : 'en-IN')}
-      />
-    </View>
+    <NavigationContainer>
+      {status === 'signed-in' ? <AppNavigator /> : <AuthNavigator />}
+    </NavigationContainer>
   );
 };
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: getMessage(mobileConfig.defaultLocale, 'common.appName') }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
-  title: { fontSize: 28, fontWeight: '700' },
-  endpoint: { color: '#666', fontSize: 12 },
-});
