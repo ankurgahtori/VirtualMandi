@@ -15,7 +15,7 @@ export const buildApp = () => {
     requestIdHeader: 'x-request-id',
   });
   app.register(sensible);
-  app.register(cors, { origin: config.corsOrigins });
+  app.register(cors, { origin: config.NODE_ENV === 'development' ? true : config.corsOrigins });
   registerErrorHandler(app);
   app.get('/health', async () => ({ status: 'ok', service: 'virtual-mandi-api' }));
   app.get('/ready', async (_request, reply) => {
