@@ -14,7 +14,8 @@ export const localeAliases: Record<string, SupportedLocale> = {
 
 export const normalizeLocale = (locale: string): SupportedLocale | undefined => {
   const normalized = locale.trim().toLowerCase();
-  return (localeAliases[normalized] ?? (SUPPORTED_LOCALES as readonly string[]).includes(locale))
-    ? (locale as SupportedLocale)
-    : undefined;
+  return (
+    localeAliases[normalized] ??
+    SUPPORTED_LOCALES.find((supported) => supported.toLowerCase() === normalized)
+  );
 };

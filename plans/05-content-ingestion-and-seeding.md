@@ -66,6 +66,13 @@ Run migrations and seed twice. Assert stable counts and IDs. Test malformed inpu
 
 ## Completion criteria
 
-- Seeded BlogPost is available for the first vertical slice.
-- Ingestion is reusable by future crawlers and does not bypass editorial status controls.
-- Failure reports are actionable and do not expose credentials or raw secrets.
+- [x] Seeded BlogPost is available for the first vertical slice.
+- [x] Ingestion is reusable by future crawlers and does not bypass editorial status controls.
+- [x] Failure reports are actionable and do not expose credentials or raw secrets.
+
+## Implementation notes
+
+- Added the server-only `@virtual-mandi/ingestion` package with adapter interfaces, a deterministic website fixture adapter, normalization, stable source identity detection, draft-by-default persistence, and structured ingestion results.
+- Ingestion persistence uses a Prisma transaction and resolves locales, categories, and locations before writing the typed `Post`/`BlogPost` graph. The default duplicate policy is `skip`; callers can explicitly request `update`.
+- Shared ingestion validation now requires `sourceItemId` or `canonicalUrl`, accepts only HTTP(S) URLs, supports `discoveredAt`/`fetchedAt`, and normalizes supported locale aliases.
+- Real website crawling and WhatsApp integration remain intentionally unimplemented until legal, credentials, rate-limit, and operational requirements are approved.
