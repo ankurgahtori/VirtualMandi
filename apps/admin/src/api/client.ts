@@ -3,6 +3,9 @@ import type {
   BlogPostCreateInput,
   BlogPostDetailDto,
   BlogPostUpdateInput,
+  IngestionSourceStatusDto,
+  IngestionSyncResultDto,
+  SyncRequestInput,
 } from '@virtual-mandi/shared';
 
 const baseUrl =
@@ -115,6 +118,17 @@ export class AdminApi {
   }
   transition(id: string, action: 'publish' | 'archive' | 'restore' | 'remove') {
     return this.request<unknown>(`/v1/admin/posts/${id}/${action}`, { method: 'POST' });
+  }
+
+  listSyncSources() {
+    return this.request<{ items: IngestionSourceStatusDto[] }>('/v1/admin/sync/sources');
+  }
+
+  syncSource(domain: string, input: SyncRequestInput = {}) {
+    return this.request<IngestionSyncResultDto>(`/v1/admin/sync/${encodeURIComponent(domain)}`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
   }
 }
 

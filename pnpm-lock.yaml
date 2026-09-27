@@ -87,6 +87,9 @@ importers:
       '@virtual-mandi/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@virtual-mandi/ingestion':
+        specifier: workspace:^
+        version: link:../../packages/ingestion
       '@virtual-mandi/shared':
         specifier: workspace:*
         version: link:../../packages/shared

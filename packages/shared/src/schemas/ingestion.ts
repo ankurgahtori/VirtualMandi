@@ -38,3 +38,13 @@ export const normalizedBlogPostInputSchema = z
   });
 
 export type NormalizedBlogPostInput = z.infer<typeof normalizedBlogPostInputSchema>;
+
+export const syncRequestSchema = z
+  .object({
+    pages: z.number().int().min(1).max(10).optional(),
+    after: z.string().datetime({ offset: true }).optional(),
+    update: z.boolean().optional(),
+  })
+  .default({});
+
+export type SyncRequestInput = z.infer<typeof syncRequestSchema>;

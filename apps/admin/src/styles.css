@@ -178,6 +178,58 @@ button:disabled {
 .table-row + .table-row {
   border-top: 1px solid #edf1eb;
 }
+.sync-table .table-head,
+.sync-table .table-row {
+  grid-template-columns: minmax(240px, 2fr) 80px minmax(160px, 1fr) 140px;
+}
+.snackbar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #1f3524;
+  color: #f0f7ee;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 12px 30px #14261466;
+  animation: snackbar-in 0.2s ease-out;
+}
+.snackbar.error {
+  background: #7d2019;
+}
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border: 2px solid #ffffff66;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinner-rotate 0.7s linear infinite;
+}
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes snackbar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
 .post-summary {
   display: flex;
   gap: 12px;

@@ -5,6 +5,7 @@ import { prisma } from '@virtual-mandi/database';
 import { registerErrorHandler } from './plugins/error-handler.js';
 import { registerAuthRoutes } from './routes/auth.js';
 import { registerAdminPostRoutes } from './routes/admin-posts.js';
+import { registerAdminSyncRoutes } from './routes/admin-sync.js';
 import { checkMediaStorage } from './services/media-service.js';
 import { config } from './config.js';
 import { registerMediaRoutes } from './routes/media.js';
@@ -32,5 +33,6 @@ export const buildApp = () => {
   app.register(registerMediaRoutes);
   app.register(registerPostRoutes);
   app.register(registerAdminPostRoutes);
+  app.register(registerAdminSyncRoutes);
   return app;
 };

@@ -52,3 +52,4 @@ Use responsive English UI, keyboard-accessible forms, clear server validation er
 - Added English-first BlogPost editing with optional Hindi translation, source/URL/media fields, filter controls, seeded-post rendering, and lifecycle confirmation actions.
 - Presigned media upload URL support is represented by the API contract; media asset registration/upload UI remains intentionally minimal until the media workflow is expanded.
 - Automated schema tests and production build pass. A browser automation suite remains a follow-up for CI.
+- Added a `/sync` page ("Content sync") backed by `GET/POST /v1/admin/sync/…` so editors can re-run website crawlers manually when the scheduled job misses. Sources are grouped by `canonicalUrl` hostname (subroutes collapsed) with per-domain post counts and last-fetch time; a successful sync shows a 3-second snackbar with the created/duplicate/rejected breakdown.

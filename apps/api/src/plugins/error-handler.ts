@@ -37,6 +37,7 @@ export const registerErrorHandler = (app: FastifyInstance) => {
       VALIDATION_ERROR: { status: 400, message: 'Request validation failed' },
       NOT_FOUND: { status: 404, message: 'Resource not found' },
       INVALID_LIFECYCLE_TRANSITION: { status: 409, message: 'Invalid post lifecycle transition' },
+      SYNC_IN_PROGRESS: { status: 409, message: 'A sync is already running for this source' },
       RATE_LIMITED: { status: 429, message: 'Too many authentication requests' },
     };
     const mapped = known[code] ?? { status: 500, message: 'Internal server error' };

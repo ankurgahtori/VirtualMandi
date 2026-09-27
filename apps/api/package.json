@@ -16,6 +16,7 @@
     "@fastify/cors": "^10.0.1",
     "@fastify/sensible": "^6.0.3",
     "@virtual-mandi/database": "workspace:*",
+    "@virtual-mandi/ingestion": "workspace:^",
     "@virtual-mandi/shared": "workspace:*",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.7",

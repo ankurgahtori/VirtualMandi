@@ -91,3 +91,4 @@ pnpm --filter @virtual-mandi/api build
 - Added DTO mapping so database records and password/token internals never leave the API boundary.
 - API contract is documented in `apps/api/API.md`.
 - Focused route tests and Docker-backed smoke tests pass. Full endpoint integration coverage remains a follow-up as admin/mobile clients are implemented.
+- Added `GET /v1/admin/sync/sources` and `POST /v1/admin/sync/:domain` (`routes/admin-sync.ts`, `services/sync-service.ts`). Domains resolve through the new `INGESTION_SOURCES` registry in `@virtual-mandi/ingestion` (`sources.ts`), which maps `www.chinimandi.com` and `krishijagran.com` to their adapters. Syncs run synchronously as PUBLISHED with skip-dedup and remote image resolution; a per-domain in-flight lock returns 409 `SYNC_IN_PROGRESS`, unknown domains 404. Request body accepts optional `{pages, after, update}` (`syncRequestSchema` in shared).

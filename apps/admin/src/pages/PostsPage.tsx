@@ -62,6 +62,9 @@ export const PostsPage = () => {
           <button className="secondary" onClick={logout}>
             Sign out
           </button>
+          <Link className="secondary button-link" to="/sync">
+            Content sync
+          </Link>
           <Link className="primary button-link" to="/posts/new">
             New BlogPost
           </Link>

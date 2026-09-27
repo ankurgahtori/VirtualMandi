@@ -4,6 +4,7 @@ import { useAdminAuth } from './auth/auth-context';
 import { LoginPage } from './pages/LoginPage';
 import { PostFormPage } from './pages/PostFormPage';
 import { PostsPage } from './pages/PostsPage';
+import { SyncPage } from './pages/SyncPage';
 
 const Protected = ({ children }: { children: ReactNode }) => {
   const { loading, user } = useAdminAuth();
@@ -20,6 +21,14 @@ export const App = () => (
       element={
         <Protected>
           <PostsPage />
+        </Protected>
+      }
+    />
+    <Route
+      path="/sync"
+      element={
+        <Protected>
+          <SyncPage />
         </Protected>
       }
     />

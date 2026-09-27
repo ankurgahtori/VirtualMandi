@@ -6,6 +6,7 @@ export * from './dtos/auth.js';
 export * from './dtos/errors.js';
 export * from './dtos/feed.js';
 export * from './dtos/post.js';
+export * from './dtos/sync.js';
 export * from './i18n/index.js';
 export * from './media/types.js';
 export * from './schemas/auth.js';
