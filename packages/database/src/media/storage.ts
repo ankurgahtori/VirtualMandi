@@ -16,16 +16,23 @@ export const s3Client = new S3Client({
   },
 });
 
-export const uploadSeedImage = async (objectKey: string, body: Uint8Array): Promise<void> => {
+export const uploadObject = async (
+  objectKey: string,
+  body: Uint8Array,
+  contentType: string,
+): Promise<void> => {
   await s3Client.send(
     new PutObjectCommand({
       Bucket: bucket,
       Key: objectKey,
       Body: body,
-      ContentType: 'image/svg+xml',
+      ContentType: contentType,
     }),
   );
 };
+
+export const uploadSeedImage = (objectKey: string, body: Uint8Array): Promise<void> =>
+  uploadObject(objectKey, body, 'image/svg+xml');
 
 export const getSeedMediaConfig = () => ({
   provider: endpoint ? ('LOCALSTACK_S3' as const) : ('S3' as const),

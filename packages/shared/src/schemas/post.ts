@@ -22,6 +22,7 @@ export const translationSchema = z.object({
 export const blogPostCreateSchema = z.object({
   type: z.literal('BLOG_POST'),
   source: postSourceSchema,
+  summary: z.string().trim().max(500).optional(),
   externalRedirectUrl: url.optional(),
   imageMediaId: z.string().trim().min(1).max(200).optional(),
   categoryIds: z.array(z.string().trim().min(1)).max(50),

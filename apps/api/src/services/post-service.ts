@@ -12,7 +12,7 @@ import {
   type BlogPostCreateInput,
   type BlogPostUpdateInput,
 } from '@virtual-mandi/shared';
-import { config } from '../config.js';
+import { publicMediaUrl } from './media-service.js';
 
 const mediaDto = (
   media:
@@ -34,7 +34,7 @@ const mediaDto = (
         provider: media.provider,
         mimeType: media.mimeType,
         objectKey: media.objectKey,
-        url: `${config.S3_PUBLIC_BASE_URL ?? ''}/${media.objectKey}`,
+        url: publicMediaUrl(media.objectKey),
         ...(media.width === null ? {} : { width: media.width }),
         ...(media.height === null ? {} : { height: media.height }),
         ...(media.sizeBytes === null ? {} : { sizeBytes: media.sizeBytes }),
@@ -53,6 +53,7 @@ type PostRecord = {
   fetchedAt: Date | null;
   crawlerName: string | null;
   crawlerVersion: string | null;
+  summary: string | null;
   categories: Array<{ categoryId: string }>;
   locations: Array<{ locationId: string }>;
   blogPost: {
@@ -90,6 +91,7 @@ const mapPost = (
     locationIds: post.locations.map((item: { locationId: string }) => item.locationId),
     title: selected.title,
     content: selected.content,
+    summary: post.summary ?? undefined,
     image: mediaDto(post.blogPost.imageMedia),
     externalRedirectUrl: post.blogPost.externalRedirectUrl ?? undefined,
     source: post.blogPost.source,
@@ -140,6 +142,8 @@ export const createBlogPost = async (input: BlogPostCreateInput, userId: string)
         type: 'BLOG_POST',
         createdById: userId,
         updatedById: userId,
+        summary: input.summary || null,
+        summaryGenerated: Boolean(input.summary),
         blogPost: {
           create: {
             source: input.source,
@@ -173,6 +177,9 @@ export const updateBlogPost = async (id: string, input: BlogPostUpdateInput, use
       where: { id },
       data: {
         updatedById: userId,
+        ...(input.summary !== undefined
+          ? { summary: input.summary || null, summaryGenerated: Boolean(input.summary) }
+          : {}),
         ...(input.categoryIds
           ? {
               categories: {

@@ -7,6 +7,7 @@ import { registerAuthRoutes } from './routes/auth.js';
 import { registerAdminPostRoutes } from './routes/admin-posts.js';
 import { checkMediaStorage } from './services/media-service.js';
 import { config } from './config.js';
+import { registerMediaRoutes } from './routes/media.js';
 import { registerPostRoutes } from './routes/posts.js';
 
 export const buildApp = () => {
@@ -28,6 +29,7 @@ export const buildApp = () => {
     }
   });
   app.register(registerAuthRoutes);
+  app.register(registerMediaRoutes);
   app.register(registerPostRoutes);
   app.register(registerAdminPostRoutes);
   return app;

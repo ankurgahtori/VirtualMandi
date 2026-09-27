@@ -21,17 +21,24 @@ import { useAuth } from '../auth/auth-context';
 import { mobileConfig } from '../config/env';
 import { defaultFilters, loadFilters, saveFilters } from '../state/filter-state';
 import { useLocale } from '../state/locale-context';
-import { safeExternalUrl } from '../utils/urls';
+import { postExcerpt } from '../utils/text';
+import { resolveMediaUrl, safeExternalUrl } from '../utils/urls';
 
 const PostCard = ({ post }: { post: BlogPostDetailDto }) => {
   const [webUrl, setWebUrl] = useState<string>();
   const sourceUrl = safeExternalUrl(post.externalRedirectUrl);
   return (
-    <View style={styles.card} accessible accessibilityLabel={post.title}>
+    <Pressable
+      style={styles.card}
+      accessible
+      accessibilityLabel={post.title}
+      accessibilityRole={sourceUrl ? 'link' : undefined}
+      onPress={sourceUrl ? () => setWebUrl(sourceUrl) : undefined}
+    >
       {post.image?.url ? (
         <Image
           accessibilityLabel={post.title}
-          source={{ uri: post.image.url }}
+          source={{ uri: resolveMediaUrl(post.image.url) }}
           style={styles.image}
         />
       ) : (
@@ -43,8 +50,7 @@ const PostCard = ({ post }: { post: BlogPostDetailDto }) => {
       <Text style={styles.meta}>
         {post.source} · {new Date(post.createdAt).toLocaleDateString()}
       </Text>
-      <Text style={styles.content}>{post.content}</Text>
-      {sourceUrl ? <Button title="Open source link" onPress={() => setWebUrl(sourceUrl)} /> : null}
+      <Text style={styles.content}>{postExcerpt(post)}</Text>
       <Modal
         animationType="slide"
         visible={webUrl !== undefined}
@@ -66,6 +72,7 @@ const PostCard = ({ post }: { post: BlogPostDetailDto }) => {
           </View>
           {webUrl ? (
             <WebView
+              style={styles.webView}
               source={{ uri: webUrl }}
               startInLoadingState
               renderLoading={() => (
@@ -77,7 +84,7 @@ const PostCard = ({ post }: { post: BlogPostDetailDto }) => {
           ) : null}
         </View>
       </Modal>
-    </View>
+    </Pressable>
   );
 };
 
@@ -455,6 +462,7 @@ const styles = StyleSheet.create({
   meta: { paddingHorizontal: 16, paddingTop: 6, color: '#687268', fontSize: 12 },
   content: { padding: 16, fontSize: 16, lineHeight: 24 },
   webContainer: { flex: 1, backgroundColor: '#fff' },
+  webView: { flex: 1 },
   webHeader: {
     flexDirection: 'row',
     alignItems: 'center',

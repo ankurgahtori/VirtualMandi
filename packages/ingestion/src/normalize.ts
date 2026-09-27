@@ -41,6 +41,7 @@ export const normalizeBlogPostInput = (input: unknown): NormalizedBlogPostInput 
   return {
     ...parsed,
     sourceItemId: parsed.sourceItemId?.trim(),
+    summary: parsed.summary ? sanitizeText(parsed.summary) : undefined,
     canonicalUrl: normalizeUrl(parsed.canonicalUrl),
     imageUrl: normalizeUrl(parsed.imageUrl),
     externalRedirectUrl: normalizeUrl(parsed.externalRedirectUrl),

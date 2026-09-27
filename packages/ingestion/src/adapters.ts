@@ -1,7 +1,7 @@
 import type { NormalizedBlogPostInput } from '@virtual-mandi/shared';
 
 export type AdapterInput = Omit<NormalizedBlogPostInput, 'initialStatus'> & {
-  initialStatus?: 'DRAFT';
+  initialStatus?: 'DRAFT' | 'PUBLISHED';
 };
 
 export interface ContentIngestionAdapter {

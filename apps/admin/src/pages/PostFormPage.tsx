@@ -5,6 +5,7 @@ import { adminApi } from '../api/client';
 
 const initial: {
   source: PostSource;
+  summary: string;
   externalRedirectUrl: string;
   imageMediaId: string;
   categoryIds: string;
@@ -15,6 +16,7 @@ const initial: {
   hiContent: string;
 } = {
   source: 'MANUAL',
+  summary: '',
   externalRedirectUrl: '',
   imageMediaId: '',
   categoryIds: '',
@@ -42,6 +44,7 @@ export const PostFormPage = () => {
         const hindi = post.translations?.find((item) => item.locale === 'hi-IN');
         setForm({
           source: post.source,
+          summary: post.summary ?? '',
           externalRedirectUrl: post.externalRedirectUrl ?? '',
           imageMediaId: post.image?.id ?? '',
           categoryIds: post.categoryIds.join(', '),
@@ -70,6 +73,7 @@ export const PostFormPage = () => {
     const input = {
       type: 'BLOG_POST' as const,
       source: form.source,
+      summary: form.summary,
       externalRedirectUrl: form.externalRedirectUrl || undefined,
       imageMediaId: form.imageMediaId || undefined,
       categoryIds: form.categoryIds
@@ -149,6 +153,15 @@ export const PostFormPage = () => {
             placeholder="Comma-separated IDs"
             value={form.locationIds}
             onChange={(event) => update('locationIds', event.target.value)}
+          />
+        </label>
+        <label>
+          Summary
+          <textarea
+            rows={3}
+            placeholder="Short feed summary (optional)"
+            value={form.summary}
+            onChange={(event) => update('summary', event.target.value)}
           />
         </label>
         <fieldset>

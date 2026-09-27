@@ -10,6 +10,10 @@ const baseUrl =
   'http://localhost:3000';
 const REFRESH_KEY = 'virtual-mandi.admin.refresh-token';
 
+/** Resolves API media URLs that may be root-relative ("/v1/media/…"). */
+export const resolveMediaUrl = (value: string | undefined) =>
+  value?.startsWith('/') ? `${baseUrl}${value}` : value;
+
 export class AdminApiError extends Error {
   constructor(
     message: string,
@@ -50,7 +54,7 @@ export class AdminApi {
 
   private saveAuth(response: AuthResponseDto) {
     this.accessToken = response.tokens.accessToken;
-    sessionStorage.setItem(REFRESH_KEY, response.tokens.refreshToken);
+    localStorage.setItem(REFRESH_KEY, response.tokens.refreshToken);
     return response;
   }
 
@@ -61,27 +65,26 @@ export class AdminApi {
     }).then((response) => this.saveAuth(response));
   }
 
-  async refresh() {
-    const refreshToken = sessionStorage.getItem(REFRESH_KEY);
+  async refresh(): Promise<AuthResponseDto | false> {
+    const refreshToken = localStorage.getItem(REFRESH_KEY);
     if (!refreshToken) return false;
     try {
-      this.saveAuth(
+      return this.saveAuth(
         await this.request<AuthResponseDto>(
           '/v1/auth/refresh',
           { method: 'POST', body: JSON.stringify({ refreshToken }) },
           false,
         ),
       );
-      return true;
     } catch {
       this.accessToken = undefined;
-      sessionStorage.removeItem(REFRESH_KEY);
+      localStorage.removeItem(REFRESH_KEY);
       return false;
     }
   }
 
   async logout() {
-    const refreshToken = sessionStorage.getItem(REFRESH_KEY);
+    const refreshToken = localStorage.getItem(REFRESH_KEY);
     if (refreshToken)
       await this.request(
         '/v1/auth/logout',
@@ -89,7 +92,7 @@ export class AdminApi {
         false,
       ).catch(() => undefined);
     this.accessToken = undefined;
-    sessionStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(REFRESH_KEY);
   }
 
   listPosts(filters: { status?: string; source?: string; type?: string } = {}) {

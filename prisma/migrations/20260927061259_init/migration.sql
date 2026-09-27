@@ -69,6 +69,7 @@ CREATE TABLE "Post" (
     "fetchedAt" TIMESTAMP(3),
     "crawlerName" TEXT,
     "crawlerVersion" TEXT,
+    "summary" TEXT,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
 );

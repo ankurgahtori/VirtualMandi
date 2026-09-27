@@ -22,6 +22,7 @@ export type BlogPostDetailDto = PostSummary & {
   type: 'BLOG_POST';
   title: string;
   content: string;
+  summary?: string;
   image?: MediaDto;
   externalRedirectUrl?: string;
   source: PostSource;
@@ -43,6 +44,7 @@ export type PostDetailDto = BlogPostDetailDto;
 export type BlogPostCreateInput = {
   type: 'BLOG_POST';
   source: PostSource;
+  summary?: string;
   externalRedirectUrl?: string;
   imageMediaId?: string;
   categoryIds: string[];

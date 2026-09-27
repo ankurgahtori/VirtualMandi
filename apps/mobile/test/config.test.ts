@@ -7,7 +7,12 @@ test('normalizes mobile API URL and locale', () => {
     EXPO_PUBLIC_API_BASE_URL: 'http://10.0.2.2:3000/',
     EXPO_PUBLIC_DEFAULT_LOCALE: 'hi',
   });
-  assert.deepEqual(config, { apiBaseUrl: 'http://10.0.2.2:3000', defaultLocale: 'hi-IN' });
+  assert.deepEqual(config, {
+    apiBaseUrl: 'http://10.0.2.2:3000',
+    defaultLocale: 'hi-IN',
+    devLoginEmail: '',
+    devLoginPassword: '',
+  });
 });
 
 test('rejects missing or unsafe API URL with setup guidance', () => {

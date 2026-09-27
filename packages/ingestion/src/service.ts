@@ -12,9 +12,10 @@ export type IngestionResult = {
   errors: Array<{ index: number; message: string }>;
 };
 
-type ImageResolver = (input: {
+export type ImageResolver = (input: {
   imageUrl?: string;
   imageFixtureKey?: string;
+  sourceItemId?: string;
 }) => Promise<{ id: string } | undefined>;
 
 type IngestionOptions = {
@@ -29,14 +30,14 @@ const findExisting = async (
   if (input.sourceItemId) {
     const byItem = await tx.post.findFirst({
       where: { ingestionSource: input.source, ingestionItemId: input.sourceItemId },
-      select: { id: true },
+      select: { id: true, summaryGenerated: true },
     });
     if (byItem) return byItem;
   }
   if (input.canonicalUrl) {
     return tx.post.findFirst({
       where: { ingestionSource: input.source, canonicalUrl: input.canonicalUrl },
-      select: { id: true },
+      select: { id: true, summaryGenerated: true },
     });
   }
   return null;
@@ -46,7 +47,7 @@ const persist = async (
   tx: Prisma.TransactionClient,
   input: ReturnType<typeof normalizeBlogPostInput>,
   imageResolver?: ImageResolver,
-  existingId?: string,
+  existing?: { id: string; summaryGenerated: boolean },
 ) => {
   const locales = await Promise.all(
     input.translations.map((translation) =>
@@ -70,21 +71,28 @@ const persist = async (
     throw new Error('One or more location keys do not exist');
 
   const image = imageResolver
-    ? await imageResolver({ imageUrl: input.imageUrl, imageFixtureKey: input.imageFixtureKey })
+    ? await imageResolver({
+        imageUrl: input.imageUrl,
+        imageFixtureKey: input.imageFixtureKey,
+        sourceItemId: input.sourceItemId,
+      })
     : undefined;
   const postData = {
     type: 'BLOG_POST' as const,
-    status: 'DRAFT' as const,
+    status: input.initialStatus,
+    publishedAt: input.initialStatus === 'PUBLISHED' ? new Date() : null,
     ingestionSource: input.source,
     ingestionItemId: input.sourceItemId,
     canonicalUrl: input.canonicalUrl,
     fetchedAt: input.fetchedAt ? new Date(input.fetchedAt) : undefined,
     crawlerName: input.crawlerName,
     crawlerVersion: input.crawlerVersion,
+    // A generated summary wins over the crawler's excerpt on re-ingestion.
+    ...(existing?.summaryGenerated ? {} : { summary: input.summary ?? null }),
   };
 
-  const post = existingId
-    ? await tx.post.update({ where: { id: existingId }, data: postData })
+  const post = existing
+    ? await tx.post.update({ where: { id: existing.id }, data: postData })
     : await tx.post.create({ data: postData });
 
   const blogPost = await tx.blogPost.upsert({
@@ -151,7 +159,9 @@ export const ingestBlogPosts = async (
         index += 1;
         continue;
       }
-      await prisma.$transaction((tx) => persist(tx, input, options.imageResolver, existing?.id));
+      await prisma.$transaction((tx) =>
+        persist(tx, input, options.imageResolver, existing ?? undefined),
+      );
       if (existing) result.updated += 1;
       else result.created += 1;
     } catch (error) {

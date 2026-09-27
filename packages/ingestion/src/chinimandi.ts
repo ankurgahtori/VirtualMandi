@@ -57,6 +57,8 @@ export type ChiniMandiAdapterOptions = {
   delayMs?: number;
   categoryKeys?: string[];
   locationKeys?: string[];
+  /** Defaults to DRAFT; pass PUBLISHED only for a trusted direct-publish run. */
+  initialStatus?: 'DRAFT' | 'PUBLISHED';
   fetchImpl?: typeof fetch;
   now?: () => Date;
 };
@@ -86,6 +88,7 @@ export class ChiniMandiAdapter implements WebsiteIngestionAdapter {
       source: this.source,
       sourceItemId: `chinimandi-${post.id}`,
       canonicalUrl: post.link,
+      summary: decodeHtmlEntities(post.excerpt?.rendered ?? '') || undefined,
       imageUrl,
       externalRedirectUrl: post.link,
       // The site only publishes a Hindi body here; the en-IN entry mirrors it
@@ -100,7 +103,7 @@ export class ChiniMandiAdapter implements WebsiteIngestionAdapter {
       fetchedAt: now,
       crawlerName: 'chinimandi-wp-api',
       crawlerVersion: '1',
-      initialStatus: 'DRAFT',
+      initialStatus: this.options.initialStatus ?? 'DRAFT',
     };
   }
 

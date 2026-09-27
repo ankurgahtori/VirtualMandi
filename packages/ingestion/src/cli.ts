@@ -22,8 +22,9 @@ const readFlagValue = (args: string[], flag: string) => {
 const usage = `Usage: tsx src/cli.ts [options]
 
 Collects the latest posts from the ChiniMandi WordPress API and ingests them
-as DRAFT blog posts. Safe to run daily: items already stored under the same
-source identity are skipped unless --update is passed.
+as PUBLISHED blog posts (pass --draft to keep them unpublished). Safe to run
+daily: items already stored under the same source identity are skipped unless
+--update is passed.
 
 Options:
   --after <iso>      Only posts published after this timestamp (e.g. 2026-09-26T00:00:00Z)
@@ -32,6 +33,7 @@ Options:
   --category <id>    WordPress category id (default 14 = Indian Sugar News in Hindi)
   --delay-ms <n>     Delay between page requests (default 1000)
   --update           Update existing posts instead of skipping duplicates
+  --draft            Ingest as DRAFT instead of the default PUBLISHED
 `;
 
 const run = async () => {
@@ -49,6 +51,7 @@ const run = async () => {
   };
 
   const { ChiniMandiAdapter } = await import('./chinimandi.js');
+  const { createRemoteImageResolver } = await import('./image-resolver.js');
   const { ingestBlogPosts } = await import('./service.js');
   const { disconnectDatabase } = await import('@virtual-mandi/database');
 
@@ -58,11 +61,13 @@ const run = async () => {
     perPage: numeric('--per-page'),
     categoryId: numeric('--category'),
     delayMs: numeric('--delay-ms'),
+    initialStatus: args.includes('--draft') ? 'DRAFT' : 'PUBLISHED',
   });
 
   try {
     const result = await ingestBlogPosts(adapter.collect(), {
       duplicatePolicy: args.includes('--update') ? 'update' : 'skip',
+      imageResolver: createRemoteImageResolver(),
     });
     console.log(JSON.stringify(result, null, 2));
   } finally {

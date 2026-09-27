@@ -26,6 +26,20 @@ export const checkMediaStorage = async () => {
   await client.send(new HeadBucketCommand({ Bucket: bucket }));
 };
 
+/**
+ * Resolves a media object's display URL. When S3_PUBLIC_BASE_URL is configured
+ * (e.g. a CDN or public bucket) it returns that absolute URL; otherwise it
+ * returns the API media proxy path, which clients resolve against their own
+ * configured API base URL — so mobile devices never see unreachable hosts.
+ */
+export const publicMediaUrl = (objectKey: string): string =>
+  config.S3_PUBLIC_BASE_URL
+    ? `${config.S3_PUBLIC_BASE_URL}/${objectKey}`
+    : `/v1/media/${objectKey}`;
+
+export const getMediaObject = (objectKey: string) =>
+  client.send(new GetObjectCommand({ Bucket: bucket, Key: objectKey }));
+
 export interface MediaStorage {
   createUploadUrl(input: {
     objectKey: string;
@@ -64,7 +78,7 @@ export const toMediaDto = (media: {
   provider: media.provider,
   mimeType: media.mimeType,
   objectKey: media.objectKey,
-  url: `${config.S3_PUBLIC_BASE_URL ?? ''}/${media.objectKey}`,
+  url: publicMediaUrl(media.objectKey),
   ...(media.width == null ? {} : { width: media.width }),
   ...(media.height == null ? {} : { height: media.height }),
   ...(media.sizeBytes == null ? {} : { sizeBytes: media.sizeBytes }),

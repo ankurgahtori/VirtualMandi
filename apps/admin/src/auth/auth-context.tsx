@@ -25,8 +25,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<AuthUserDto>();
   const [error, setError] = useState<string>();
   useEffect(() => {
-    adminApi.refresh().then((valid) => {
-      if (!valid) sessionStorage.removeItem('virtual-mandi.admin.refresh-token');
+    adminApi.refresh().then((response) => {
+      if (response && response.user.role === 'ADMIN') setUser(response.user);
+      else if (response) void adminApi.logout();
       setLoading(false);
     });
   }, []);

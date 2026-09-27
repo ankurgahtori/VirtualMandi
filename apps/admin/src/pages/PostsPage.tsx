@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { AdminPost } from '../api/client';
-import { AdminApiError, adminApi } from '../api/client';
+import { AdminApiError, adminApi, resolveMediaUrl } from '../api/client';
 import { useAdminAuth } from '../auth/auth-context';
 
 const excerpt = (content: string) => (content.length > 150 ? `${content.slice(0, 150)}…` : content);
@@ -115,7 +115,7 @@ export const PostsPage = () => {
             <article className="table-row" key={post.id}>
               <div className="post-summary">
                 {post.image?.url ? (
-                  <img src={post.image.url} alt="" />
+                  <img src={resolveMediaUrl(post.image.url)} alt="" />
                 ) : (
                   <div className="thumb-placeholder">🌾</div>
                 )}
