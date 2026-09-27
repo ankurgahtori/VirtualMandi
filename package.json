@@ -24,6 +24,7 @@
     "ingest:businessline": "pnpm --filter @virtual-mandi/ingestion crawl:businessline",
     "ingest:chinimandi": "pnpm --filter @virtual-mandi/ingestion crawl:chinimandi",
     "ingest:krishijagran": "pnpm --filter @virtual-mandi/ingestion crawl:krishijagran",
+    "ingest:adapter": "pnpm --filter @virtual-mandi/ingestion crawl:adapter",
     "db:reset": "pnpm --filter @virtual-mandi/database db:reset",
     "integration:smoke": "node scripts/integration-smoke.mjs",
     "integration:local": "node scripts/integration-local.mjs",

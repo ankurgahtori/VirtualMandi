@@ -10,7 +10,9 @@ import {
 type TranslationTree = typeof en;
 export type TranslationKey = `${keyof TranslationTree & string}.${string}`;
 
-const resources: Record<SupportedLocale, TranslationTree> = {
+// Locales without a UI dictionary (e.g. mr-IN, content-only for now) fall
+// back to English strings.
+const resources: Partial<Record<SupportedLocale, TranslationTree>> = {
   'en-IN': en,
   'hi-IN': hi,
 };
@@ -26,13 +28,13 @@ const getNestedValue = (resource: TranslationTree, key: string): string | undefi
 export const getMessage = (locale: string, key: string): string => {
   const normalized = normalizeLocale(locale) ?? DEFAULT_LOCALE;
   return (
-    getNestedValue(resources[normalized], key) ??
-    getNestedValue(resources[ENGLISH_LOCALE], key) ??
+    getNestedValue(resources[normalized] ?? resources[ENGLISH_LOCALE]!, key) ??
+    getNestedValue(resources[ENGLISH_LOCALE]!, key) ??
     key
   );
 };
 
 export const getMessages = (locale: string): TranslationTree => {
   const normalized = normalizeLocale(locale) ?? DEFAULT_LOCALE;
-  return resources[normalized];
+  return resources[normalized] ?? en;
 };

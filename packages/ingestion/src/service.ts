@@ -18,9 +18,64 @@ export type ImageResolver = (input: {
   sourceItemId?: string;
 }) => Promise<{ id: string } | undefined>;
 
+export type SyncAttribution = {
+  syncSourceId?: string;
+  syncSourceCategoryId?: string;
+};
+
 type IngestionOptions = {
   duplicatePolicy?: DuplicatePolicy;
   imageResolver?: ImageResolver;
+  /** Stamps Post.syncSourceId/syncSourceCategoryId on every item in the run. */
+  attribution?: SyncAttribution;
+};
+
+/**
+ * Resolves the SyncSource (by canonicalUrl hostname) and SyncSourceCategory
+ * (longest listingUrl path-prefix match) for a post. Sources are loaded once
+ * per ingestion run so CLI jobs attribute posts without explicit options.
+ */
+const createAttributionResolver = () => {
+  let sources:
+    | Array<{
+        id: string;
+        domain: string;
+        categories: Array<{ id: string; listingUrl: string }>;
+      }>
+    | undefined;
+  return async (canonicalUrl?: string): Promise<SyncAttribution> => {
+    if (!canonicalUrl) return {};
+    let url: URL;
+    try {
+      url = new URL(canonicalUrl);
+    } catch {
+      return {};
+    }
+    sources ??= await prisma.syncSource.findMany({
+      select: {
+        id: true,
+        domain: true,
+        categories: {
+          where: { isActive: true },
+          select: { id: true, listingUrl: true },
+        },
+      },
+    });
+    const source = sources.find((entry) => entry.domain === url.hostname);
+    if (!source) return {};
+    const category = source.categories
+      .map((entry) => {
+        try {
+          return { id: entry.id, base: new URL(entry.listingUrl).pathname.replace(/\/+$/, '') };
+        } catch {
+          return undefined;
+        }
+      })
+      .filter((entry): entry is { id: string; base: string } => entry !== undefined)
+      .sort((a, b) => b.base.length - a.base.length)
+      .find((entry) => url.pathname === entry.base || url.pathname.startsWith(`${entry.base}/`));
+    return { syncSourceId: source.id, syncSourceCategoryId: category?.id };
+  };
 };
 
 const findExisting = async (
@@ -46,8 +101,9 @@ const findExisting = async (
 const persist = async (
   tx: Prisma.TransactionClient,
   input: ReturnType<typeof normalizeBlogPostInput>,
-  imageResolver?: ImageResolver,
+  image: { id: string } | undefined,
   existing?: { id: string; summaryGenerated: boolean },
+  attribution?: SyncAttribution,
 ) => {
   const locales = await Promise.all(
     input.translations.map((translation) =>
@@ -69,14 +125,6 @@ const persist = async (
     throw new Error('One or more category keys do not exist');
   if (locations.length !== input.locationKeys.length)
     throw new Error('One or more location keys do not exist');
-
-  const image = imageResolver
-    ? await imageResolver({
-        imageUrl: input.imageUrl,
-        imageFixtureKey: input.imageFixtureKey,
-        sourceItemId: input.sourceItemId,
-      })
-    : undefined;
   const postData = {
     type: 'BLOG_POST' as const,
     status: input.initialStatus,
@@ -87,6 +135,10 @@ const persist = async (
     fetchedAt: input.fetchedAt ? new Date(input.fetchedAt) : undefined,
     crawlerName: input.crawlerName,
     crawlerVersion: input.crawlerVersion,
+    ...(attribution?.syncSourceId ? { syncSourceId: attribution.syncSourceId } : {}),
+    ...(attribution?.syncSourceCategoryId
+      ? { syncSourceCategoryId: attribution.syncSourceCategoryId }
+      : {}),
     // A generated summary wins over the crawler's excerpt on re-ingestion.
     ...(existing?.summaryGenerated ? {} : { summary: input.summary ?? null }),
   };
@@ -148,6 +200,9 @@ export const ingestBlogPosts = async (
     rejected: 0,
     errors: [],
   };
+  const resolveAttribution = options.attribution
+    ? () => Promise.resolve(options.attribution)
+    : createAttributionResolver();
   let index = 0;
   for await (const raw of inputs) {
     try {
@@ -159,8 +214,19 @@ export const ingestBlogPosts = async (
         index += 1;
         continue;
       }
-      await prisma.$transaction((tx) =>
-        persist(tx, input, options.imageResolver, existing ?? undefined),
+      const attribution = await resolveAttribution(input.canonicalUrl);
+      // Resolve the image (remote fetch + S3 upload) outside the transaction —
+      // network latency would otherwise blow the interactive-tx timeout.
+      const image = options.imageResolver
+        ? await options.imageResolver({
+            imageUrl: input.imageUrl,
+            imageFixtureKey: input.imageFixtureKey,
+            sourceItemId: input.sourceItemId,
+          })
+        : undefined;
+      await prisma.$transaction(
+        (tx) => persist(tx, input, image, existing ?? undefined, attribution),
+        { timeout: 15000 },
       );
       if (existing) result.updated += 1;
       else result.created += 1;

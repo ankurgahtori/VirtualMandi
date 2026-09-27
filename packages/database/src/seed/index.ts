@@ -5,6 +5,7 @@ import { seedLocales } from './locale.seed.js';
 import { seedLocations } from './location.seed.js';
 import { seedMedia } from './media.seed.js';
 import { seedPost } from './post.seed.js';
+import { backfillPostSyncAttribution, seedSyncSources } from './sync-source.seed.js';
 import { seedUsers } from './user.seed.js';
 
 const run = async () => {
@@ -20,7 +21,11 @@ const run = async () => {
   await seedMedia();
   await seedPost(admin.id);
   await seedBlogPost();
-  console.log('Database seed completed: 1 published BLOG_POST fixture');
+  await seedSyncSources();
+  const linked = await backfillPostSyncAttribution();
+  console.log(
+    `Database seed completed: 1 published BLOG_POST fixture, ${linked} posts linked to sync sources`,
+  );
 };
 
 run()

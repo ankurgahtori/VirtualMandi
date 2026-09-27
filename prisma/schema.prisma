@@ -73,29 +73,33 @@ model Locale {
 }
 
 model Post {
-  id               String         @id @default(cuid())
-  type             PostType
-  status           PostStatus     @default(DRAFT)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  publishedAt      DateTime?
-  archivedAt       DateTime?
-  removedAt        DateTime?
-  createdById      String?
-  updatedById      String?
-  ingestionSource  PostSource?
-  ingestionItemId  String?
-  canonicalUrl     String?
-  fetchedAt        DateTime?
-  crawlerName      String?
-  crawlerVersion   String?
-  summary          String?
-  summaryGenerated Boolean        @default(false)
-  blogPost         BlogPost?
-  createdBy        User?          @relation("PostCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  updatedBy        User?          @relation("PostUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
-  categories       PostCategory[]
-  locations        PostLocation[]
+  id                   String              @id @default(cuid())
+  type                 PostType
+  status               PostStatus          @default(DRAFT)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  publishedAt          DateTime?
+  archivedAt           DateTime?
+  removedAt            DateTime?
+  createdById          String?
+  updatedById          String?
+  ingestionSource      PostSource?
+  ingestionItemId      String?
+  canonicalUrl         String?
+  fetchedAt            DateTime?
+  crawlerName          String?
+  crawlerVersion       String?
+  summary              String?
+  summaryGenerated     Boolean             @default(false)
+  syncSourceId         String?
+  syncSourceCategoryId String?
+  blogPost             BlogPost?
+  createdBy            User?               @relation("PostCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy            User?               @relation("PostUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  syncSource           SyncSource?         @relation(fields: [syncSourceId], references: [id], onDelete: SetNull)
+  syncSourceCategory   SyncSourceCategory? @relation(fields: [syncSourceCategoryId], references: [id], onDelete: SetNull)
+  categories           PostCategory[]
+  locations            PostLocation[]
 
   @@unique([ingestionSource, ingestionItemId])
   @@index([status, publishedAt, id])
@@ -103,6 +107,8 @@ model Post {
   @@index([ingestionSource, canonicalUrl])
   @@index([createdAt])
   @@index([summaryGenerated])
+  @@index([syncSourceId])
+  @@index([syncSourceCategoryId])
 }
 
 model BlogPost {
@@ -149,28 +155,64 @@ model MediaAsset {
 }
 
 model Category {
-  id        String         @id @default(cuid())
-  key       String         @unique
-  name      String
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  posts     PostCategory[]
+  id                   String                @id @default(cuid())
+  key                  String                @unique
+  name                 String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  posts                PostCategory[]
+  syncSourceCategories SyncSourceCategory[]
 }
 
 model Location {
-  id        String         @id @default(cuid())
-  key       String         @unique
-  name      String
-  level     String
-  parentId  String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  parent    Location?      @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children  Location[]     @relation("LocationTree")
-  posts     PostLocation[]
+  id                   String                @id @default(cuid())
+  key                  String                @unique
+  name                 String
+  level                String
+  parentId             String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  parent               Location?             @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children             Location[]            @relation("LocationTree")
+  posts                PostLocation[]
+  syncSourceCategories SyncSourceCategory[]
 
   @@index([parentId])
   @@index([level])
+}
+
+model SyncSource {
+  id         String                @id @default(cuid())
+  domain     String                @unique
+  label      String
+  adapterKey String
+  isActive   Boolean               @default(true)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  categories SyncSourceCategory[]
+  posts      Post[]
+}
+
+model SyncSourceCategory {
+  id            String     @id @default(cuid())
+  syncSourceId  String
+  label         String
+  listingUrl    String
+  categoryId    String?
+  locationId    String?
+  adapterConfig Json?
+  isActive      Boolean    @default(true)
+  lastSyncedAt  DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  syncSource    SyncSource @relation(fields: [syncSourceId], references: [id], onDelete: Cascade)
+  feedCategory  Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  location      Location?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  posts         Post[]
+
+  @@unique([syncSourceId, listingUrl])
+  @@index([categoryId])
+  @@index([locationId])
 }
 
 model PostCategory {

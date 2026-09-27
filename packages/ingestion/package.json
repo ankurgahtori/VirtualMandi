@@ -14,7 +14,8 @@
     "test": "tsx --test test/**/*.test.ts",
     "crawl:businessline": "tsx src/businessline-cli.ts",
     "crawl:chinimandi": "tsx src/cli.ts",
-    "crawl:krishijagran": "tsx src/krishijagran-cli.ts"
+    "crawl:krishijagran": "tsx src/krishijagran-cli.ts",
+    "crawl:adapter": "tsx src/sync-cli.ts"
   },
   "dependencies": {
     "@virtual-mandi/database": "workspace:*",

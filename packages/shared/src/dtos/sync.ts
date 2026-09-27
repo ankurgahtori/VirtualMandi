@@ -1,10 +1,41 @@
-export type IngestionSourceStatusDto = {
-  /** Hostname posts are grouped under, e.g. "krishijagran.com". */
-  domain: string;
+export type SyncCategoryStatusDto = {
+  id: string;
   label: string;
+  listingUrl: string;
+  categoryKey?: string;
+  categoryName?: string;
+  locationKey?: string;
   postCount: number;
   lastFetchedAt?: string;
+  lastSyncedAt?: string;
   syncing: boolean;
+};
+
+export type SyncSourceStatusDto = {
+  id: string;
+  domain: string;
+  label: string;
+  adapterKey: string;
+  isActive: boolean;
+  categories: SyncCategoryStatusDto[];
+};
+
+export type IngestionAdapterDto = {
+  key: string;
+  label: string;
+};
+
+export type TaxonomyOptionDto = {
+  id: string;
+  key: string;
+  name: string;
+};
+
+export type SyncSourcesResponseDto = {
+  items: SyncSourceStatusDto[];
+  adapters: IngestionAdapterDto[];
+  feedCategories: TaxonomyOptionDto[];
+  locations: TaxonomyOptionDto[];
 };
 
 export type IngestionSyncResultDto = {

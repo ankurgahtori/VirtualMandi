@@ -32,3 +32,18 @@ test('protected routes reject missing bearer token', async () => {
   assert.equal(response.json().error.code, 'UNAUTHORIZED');
   await app.close();
 });
+
+test('sync admin routes reject missing bearer token', async () => {
+  const app = buildApp();
+  for (const request of [
+    { method: 'GET' as const, url: '/v1/admin/sync/sources' },
+    { method: 'POST' as const, url: '/v1/admin/sync/sources' },
+    { method: 'POST' as const, url: '/v1/admin/sync/categories' },
+    { method: 'POST' as const, url: '/v1/admin/sync/categories/abc/sync' },
+  ]) {
+    const response = await app.inject({ ...request, payload: {} });
+    assert.equal(response.statusCode, 401, `${request.method} ${request.url}`);
+    assert.equal(response.json().error.code, 'UNAUTHORIZED');
+  }
+  await app.close();
+});

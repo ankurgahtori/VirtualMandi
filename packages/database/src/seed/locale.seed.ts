@@ -3,6 +3,7 @@ import { prisma } from '../client.js';
 const locales = [
   { code: 'en-IN', displayName: 'English' },
   { code: 'hi-IN', displayName: 'हिन्दी' },
+  { code: 'mr-IN', displayName: 'मराठी' },
 ];
 
 export const seedLocales = async () => {

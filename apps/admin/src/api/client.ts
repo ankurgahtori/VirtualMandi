@@ -3,9 +3,11 @@ import type {
   BlogPostCreateInput,
   BlogPostDetailDto,
   BlogPostUpdateInput,
-  IngestionSourceStatusDto,
   IngestionSyncResultDto,
   SyncRequestInput,
+  SyncSourceCategoryCreateInput,
+  SyncSourceCreateInput,
+  SyncSourcesResponseDto,
 } from '@virtual-mandi/shared';
 
 const baseUrl =
@@ -121,14 +123,28 @@ export class AdminApi {
   }
 
   listSyncSources() {
-    return this.request<{ items: IngestionSourceStatusDto[] }>('/v1/admin/sync/sources');
+    return this.request<SyncSourcesResponseDto>('/v1/admin/sync/sources');
   }
 
-  syncSource(domain: string, input: SyncRequestInput = {}) {
-    return this.request<IngestionSyncResultDto>(`/v1/admin/sync/${encodeURIComponent(domain)}`, {
+  createSyncSource(input: SyncSourceCreateInput) {
+    return this.request<unknown>('/v1/admin/sync/sources', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+  }
+
+  createSyncCategory(input: SyncSourceCategoryCreateInput) {
+    return this.request<unknown>('/v1/admin/sync/categories', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  }
+
+  syncCategory(id: string, input: SyncRequestInput = {}) {
+    return this.request<IngestionSyncResultDto>(
+      `/v1/admin/sync/categories/${encodeURIComponent(id)}/sync`,
+      { method: 'POST', body: JSON.stringify(input) },
+    );
   }
 }
 

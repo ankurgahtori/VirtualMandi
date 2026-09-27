@@ -37,7 +37,17 @@ export const registerErrorHandler = (app: FastifyInstance) => {
       VALIDATION_ERROR: { status: 400, message: 'Request validation failed' },
       NOT_FOUND: { status: 404, message: 'Resource not found' },
       INVALID_LIFECYCLE_TRANSITION: { status: 409, message: 'Invalid post lifecycle transition' },
-      SYNC_IN_PROGRESS: { status: 409, message: 'A sync is already running for this source' },
+      SYNC_IN_PROGRESS: { status: 409, message: 'A sync is already running for this category' },
+      UNKNOWN_ADAPTER: { status: 400, message: 'Unknown ingestion adapter key' },
+      LISTING_DOMAIN_MISMATCH: {
+        status: 400,
+        message: 'Listing URL hostname must match the sync source domain',
+      },
+      SYNC_SOURCE_EXISTS: { status: 409, message: 'A sync source with this domain already exists' },
+      SYNC_CATEGORY_EXISTS: {
+        status: 409,
+        message: 'This listing URL is already registered on the source',
+      },
       RATE_LIMITED: { status: 429, message: 'Too many authentication requests' },
     };
     const mapped = known[code] ?? { status: 500, message: 'Internal server error' };

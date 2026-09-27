@@ -182,6 +182,17 @@ button:disabled {
 .sync-table .table-row {
   grid-template-columns: minmax(240px, 2fr) 80px minmax(160px, 1fr) 140px;
 }
+.sync-form {
+  margin-bottom: 14px;
+  padding: 14px 18px;
+}
+.sync-form summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.sync-form .form-grid {
+  margin-top: 14px;
+}
 .snackbar {
   position: fixed;
   left: 50%;

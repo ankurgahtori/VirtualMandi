@@ -61,8 +61,13 @@ export const parseBusinessLineListing = (
   categoryPath = '/economy/agri-business/',
   baseUrl = 'https://www.thehindubusinessline.com',
 ): BusinessLineListingItem[] => {
+  // Section listings link to same-section stories; /topic/ pages link to
+  // stories under their real section paths (/economy/…, /multimedia/…).
+  const hrefPattern = categoryPath.startsWith('/topic/')
+    ? `[^"']*/article\\d+\\.ece`
+    : `[^"']*${escapeRegExp(categoryPath)}[a-zA-Z0-9-]+/article\\d+\\.ece`;
   const anchorPattern = new RegExp(
-    `<a\\b([^>]*href=["']([^"']*${escapeRegExp(categoryPath)}[a-zA-Z0-9-]+/article\\d+\\.ece)["'][^>]*)>([\\s\\S]*?)</a>`,
+    `<a\\b([^>]*href=["'](${hrefPattern})["'][^>]*)>([\\s\\S]*?)</a>`,
     'gi',
   );
   const byUrl = new Map<string, BusinessLineListingItem>();

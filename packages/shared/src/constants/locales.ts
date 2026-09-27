@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['en-IN', 'hi-IN'] as const;
+export const SUPPORTED_LOCALES = ['en-IN', 'hi-IN', 'mr-IN'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: SupportedLocale = 'en-IN';
@@ -10,6 +10,8 @@ export const localeAliases: Record<string, SupportedLocale> = {
   'en-in': 'en-IN',
   hi: 'hi-IN',
   'hi-in': 'hi-IN',
+  mr: 'mr-IN',
+  'mr-in': 'mr-IN',
 };
 
 export const normalizeLocale = (locale: string): SupportedLocale | undefined => {

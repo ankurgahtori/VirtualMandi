@@ -13,3 +13,4 @@ export * from './schemas/auth.js';
 export * from './schemas/feed.js';
 export * from './schemas/ingestion.js';
 export * from './schemas/post.js';
+export * from './schemas/sync-source.js';
