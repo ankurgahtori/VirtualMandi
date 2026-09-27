@@ -1,4 +1,5 @@
 import type { WebsiteIngestionAdapter } from './adapters.js';
+import { BusinessLineAdapter } from './businessline.js';
 import { ChiniMandiAdapter } from './chinimandi.js';
 import { KrishiJagranAdapter } from './krishijagran.js';
 
@@ -37,6 +38,16 @@ export const INGESTION_SOURCES: IngestionSourceDefinition[] = [
     label: 'Krishi Jagran — Commodity news',
     createAdapter: (options) =>
       new KrishiJagranAdapter({
+        after: options?.after,
+        maxPages: options?.maxPages,
+        initialStatus: options?.initialStatus ?? 'PUBLISHED',
+      }),
+  },
+  {
+    domain: 'www.thehindubusinessline.com',
+    label: 'The Hindu BusinessLine — Agri business',
+    createAdapter: (options) =>
+      new BusinessLineAdapter({
         after: options?.after,
         maxPages: options?.maxPages,
         initialStatus: options?.initialStatus ?? 'PUBLISHED',

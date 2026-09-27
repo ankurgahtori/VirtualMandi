@@ -21,6 +21,7 @@
     "prisma:generate": "pnpm --filter @virtual-mandi/database prisma:generate",
     "db:migrate": "pnpm --filter @virtual-mandi/database db:migrate",
     "db:seed": "pnpm --filter @virtual-mandi/database db:seed",
+    "ingest:businessline": "pnpm --filter @virtual-mandi/ingestion crawl:businessline",
     "ingest:chinimandi": "pnpm --filter @virtual-mandi/ingestion crawl:chinimandi",
     "ingest:krishijagran": "pnpm --filter @virtual-mandi/ingestion crawl:krishijagran",
     "db:reset": "pnpm --filter @virtual-mandi/database db:reset",

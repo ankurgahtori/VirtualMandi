@@ -4,7 +4,11 @@ import { findIngestionSourceByDomain, INGESTION_SOURCES } from '../src/sources.j
 
 test('registry resolves adapters by canonical domain', () => {
   const domains = INGESTION_SOURCES.map((source) => source.domain);
-  assert.deepEqual(domains, ['www.chinimandi.com', 'krishijagran.com']);
+  assert.deepEqual(domains, [
+    'www.chinimandi.com',
+    'krishijagran.com',
+    'www.thehindubusinessline.com',
+  ]);
 
   const source = findIngestionSourceByDomain('krishijagran.com');
   assert.ok(source);
