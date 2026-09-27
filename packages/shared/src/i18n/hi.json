@@ -29,5 +29,20 @@
     "readMore": "और पढ़ें",
     "source": "स्रोत",
     "openLink": "स्रोत लिंक खोलें"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "changeLanguage": "भाषा बदलें",
+    "language": "भाषा",
+    "account": "खाता"
+  },
+  "language": {
+    "title": "भाषा चुनें",
+    "english": "English",
+    "hindi": "हिंदी"
+  },
+  "tabs": {
+    "feed": "फ़ीड",
+    "profile": "प्रोफ़ाइल"
   }
 }

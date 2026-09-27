@@ -20,7 +20,14 @@ export const readMobileConfig = (env: Record<string, string | undefined>) => {
   return {
     apiBaseUrl: rawApiBaseUrl.replace(/\/$/, ''),
     defaultLocale: normalizeLocale(rawLocale) ?? 'en-IN',
-  } satisfies { apiBaseUrl: string; defaultLocale: SupportedLocale };
+    devLoginEmail: env.EXPO_PUBLIC_DEV_LOGIN_EMAIL?.trim() ?? '',
+    devLoginPassword: env.EXPO_PUBLIC_DEV_LOGIN_PASSWORD ?? '',
+  } satisfies {
+    apiBaseUrl: string;
+    defaultLocale: SupportedLocale;
+    devLoginEmail: string;
+    devLoginPassword: string;
+  };
 };
 
 export const mobileConfig = readMobileConfig(process.env);

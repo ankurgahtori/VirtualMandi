@@ -21,55 +21,48 @@ pnpm db:migrate
 pnpm db:seed
 ```
 
-## iOS Simulator
+## One-time mobile environment
 
-1. Install Xcode from the Mac App Store.
-2. Install Command Line Tools: `xcode-select --install`.
-3. Open Xcode once, accept the license, and install an iOS Simulator runtime under **Settings → Platforms**.
-4. Verify: `xcodebuild -version` and `xcrun simctl list devices`.
-5. Copy `.env.example` to `.env.local`; use:
+Create `apps/mobile/.env.local` once:
 
 ```dotenv
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
 EXPO_PUBLIC_DEFAULT_LOCALE=en-IN
+
+# Optional development-only login prefill; do not use these in production.
+EXPO_PUBLIC_DEV_LOGIN_EMAIL=admin@virtualmandi.local
+EXPO_PUBLIC_DEV_LOGIN_PASSWORD=VirtualMandi123!
 ```
 
-Run:
+The API server stays on `http://localhost:3000`. On iOS Simulator, `localhost` already means the Mac. The `start` command automatically attempts `adb reverse`, which maps Android Emulator `localhost:3000` to Mac `localhost:3000`; it safely does nothing when no Android emulator is connected.
+
+## Install the mobile build
+
+Start the selected iOS Simulator or Android Emulator first, then run one command.
+
+### iOS Simulator
 
 ```bash
-pnpm --filter @virtual-mandi/mobile ios
+pnpm --filter @virtual-mandi/mobile install:ios
 ```
 
-`localhost` resolves to the Mac from the iOS Simulator.
-
-## Android Emulator
-
-1. Install Android Studio.
-2. In SDK Manager install Android SDK Platform 35, Android SDK Build-Tools, Android SDK Platform-Tools, Android Emulator, and Android SDK Command-line Tools.
-3. Create a Pixel API 35 virtual device in Device Manager and start it.
-4. Add the SDK to the shell environment (adjust the SDK path if Android Studio uses another location):
+### Android Emulator
 
 ```bash
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export ANDROID_SDK_ROOT="$ANDROID_HOME"
-export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin"
+pnpm --filter @virtual-mandi/mobile install:android
 ```
 
-5. Verify: `adb devices`, `emulator -list-avds`, and `npx expo --version`.
-6. Use the Android host alias:
+These commands build and install the native development build without starting the Expo server.
 
-```dotenv
-EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:3000
-EXPO_PUBLIC_DEFAULT_LOCALE=en-IN
-```
+## Start the Expo server
 
-Run:
+Run this in a separate terminal:
 
 ```bash
-pnpm --filter @virtual-mandi/mobile android
+pnpm --filter @virtual-mandi/mobile start
 ```
 
-`10.0.2.2` maps from the Android emulator to the Mac host. If the API is bound only to another interface or a firewall blocks it, use the Mac LAN IP instead.
+The server uses the development build installed above. Keep this terminal running while using the app. You do not need to update `EXPO_PUBLIC_API_BASE_URL` for each start.
 
 ## Physical device
 
@@ -94,4 +87,4 @@ EXPO_PUBLIC_DEFAULT_LOCALE=en-IN
 
 ## Startup configuration
 
-`EXPO_PUBLIC_API_BASE_URL` is required and must be HTTP(S). Invalid or missing values fail at startup with a pointer to this file. `EXPO_PUBLIC_DEFAULT_LOCALE` accepts the shared locale aliases (`en`, `en-IN`, `hi`, `hi-IN`) and falls back to English.
+`EXPO_PUBLIC_API_BASE_URL` is required and must be HTTP(S). Invalid or missing values fail at startup with a pointer to this file. `EXPO_PUBLIC_DEFAULT_LOCALE` accepts the shared locale aliases (`en`, `en-IN`, `hi`, `hi-IN`) and falls back to English. The optional `EXPO_PUBLIC_DEV_LOGIN_EMAIL` and `EXPO_PUBLIC_DEV_LOGIN_PASSWORD` values prefill only the login form in development builds (`__DEV__`); remove them from `.env.local` whenever you no longer want the prefill.

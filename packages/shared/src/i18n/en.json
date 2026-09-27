@@ -29,5 +29,20 @@
     "readMore": "Read more",
     "source": "Source",
     "openLink": "Open source link"
+  },
+  "profile": {
+    "title": "Profile",
+    "changeLanguage": "Change language",
+    "language": "Language",
+    "account": "Account"
+  },
+  "language": {
+    "title": "Choose language",
+    "english": "English",
+    "hindi": "हिंदी"
+  },
+  "tabs": {
+    "feed": "Feed",
+    "profile": "Profile"
   }
 }

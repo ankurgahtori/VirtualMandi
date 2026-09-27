@@ -13,6 +13,26 @@ The development seed is idempotent and creates the local admin and one published
 
 ## API startup
 
+Create the ignored local environment file once from the committed template:
+
+```bash
+cp .env.example .env.local
+```
+
+If PostgreSQL is exposed on host port `5433`, set this in `.env.local`:
+
+```dotenv
+DATABASE_URL=postgresql://virtual_mandi:virtual_mandi_local@localhost:5433/virtual_mandi?schema=public
+```
+
+The API automatically loads the repository root `.env.local` (then `.env`) in development. Variables already supplied by the shell or deployment environment take precedence. Start or restart the API after changing environment values:
+
+```bash
+pnpm --filter @virtual-mandi/api dev
+```
+
+You can also prefix variables on the command line when needed:
+
 ```bash
 DATABASE_URL='postgresql://virtual_mandi:virtual_mandi_local@localhost:5433/virtual_mandi?schema=public' \
 JWT_SECRET='local-development-secret-change-me' \
@@ -21,6 +41,22 @@ pnpm --filter @virtual-mandi/api dev
 ```
 
 `/health` checks process availability. `/ready` checks PostgreSQL and the configured S3/LocalStack bucket. Fastify emits structured JSON logs with request IDs; error responses include a request ID and do not include secrets or password hashes.
+
+## Admin startup
+
+The admin frontend reads `VITE_API_BASE_URL` from `apps/admin/.env.local`, which is ignored by Git and loaded automatically by Vite. Create it once if needed:
+
+```bash
+printf '%s\\n' 'VITE_API_BASE_URL=http://localhost:3000' > apps/admin/.env.local
+```
+
+Start the admin without prefixing environment variables:
+
+```bash
+pnpm --filter @virtual-mandi/admin dev
+```
+
+Vite normally serves the dashboard at `http://localhost:5173`; if that port is occupied, use the alternate URL printed by Vite.
 
 ## Integration smoke test
 

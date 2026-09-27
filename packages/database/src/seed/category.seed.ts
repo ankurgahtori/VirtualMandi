@@ -6,4 +6,9 @@ export const seedCategories = async () => {
     update: { name: 'Market prices' },
     create: { id: 'seed-category-market-prices', key: 'market-prices', name: 'Market prices' },
   });
+  await prisma.category.upsert({
+    where: { key: 'news' },
+    update: { name: 'News' },
+    create: { id: 'seed-category-news', key: 'news', name: 'News' },
+  });
 };

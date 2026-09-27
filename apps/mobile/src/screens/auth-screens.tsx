@@ -15,8 +15,10 @@ import { mobileConfig } from '../config/env';
 type AuthScreenProps = { onRegister: () => void };
 const AuthForm = ({ mode, onSwitch }: { mode: 'login' | 'register'; onSwitch: () => void }) => {
   const { login, register, error, clearError } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(mode === 'login' && __DEV__ ? mobileConfig.devLoginEmail : '');
+  const [password, setPassword] = useState(
+    mode === 'login' && __DEV__ ? mobileConfig.devLoginPassword : '',
+  );
   const [busy, setBusy] = useState(false);
   const submit = async () => {
     setBusy(true);

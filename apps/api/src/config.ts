@@ -1,4 +1,23 @@
+import { existsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 import { z } from 'zod';
+
+const apiDirectory = dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = resolve(apiDirectory, '../../..');
+
+// Shell/deployment variables take precedence. Local development can use the
+// repository templates without requiring every command to prefix env values.
+for (const envFile of [
+  process.env.ENV_FILE,
+  resolve(repositoryRoot, '.env.local'),
+  resolve(repositoryRoot, '.env'),
+].filter((file): file is string => Boolean(file))) {
+  if (existsSync(envFile)) {
+    dotenv.config({ path: envFile, override: false });
+  }
+}
 
 const configSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

@@ -7,5 +7,5 @@
     "noEmit": true,
     "allowJs": false
   },
-  "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
