@@ -22,6 +22,7 @@
     "db:migrate": "pnpm --filter @virtual-mandi/database db:migrate",
     "db:seed": "pnpm --filter @virtual-mandi/database db:seed",
     "ingest:chinimandi": "pnpm --filter @virtual-mandi/ingestion crawl:chinimandi",
+    "ingest:krishijagran": "pnpm --filter @virtual-mandi/ingestion crawl:krishijagran",
     "db:reset": "pnpm --filter @virtual-mandi/database db:reset",
     "integration:smoke": "node scripts/integration-smoke.mjs",
     "integration:local": "node scripts/integration-local.mjs",
